@@ -1,12 +1,14 @@
 package org.modifier.compiler;
 
+import org.modifier.parser.*;
 import org.modifier.scanner.*;
 
 import java.io.*;
 import java.text.ParseException;
 import java.util.*;
 
-public class ESCompiler {
+public class ESCompiler
+{
     public static void main (String[] args) throws ParseException, FileNotFoundException
     {
         Map<String, String> opts = parseOpts(args);
@@ -15,10 +17,6 @@ public class ESCompiler {
         org.modifier.scanner.Scanner scanner = new org.modifier.scanner.Scanner(getStringFromInputStream(stream));
         ES5Keywords keywords = new ES5Keywords();
         keywords.reserveWords(scanner);
-
-        for (Token token : scanner) {
-            System.out.println(token.toString());
-        }
     }
 
     public static HashMap<String, String> parseOpts (String[] args) throws ParseException
@@ -28,7 +26,8 @@ public class ESCompiler {
 
         for (int i = 0; i < args.length; i++)
         {
-            switch (args[i]) {
+            switch (args[i])
+            {
                 case "-i":
                     result.put("i", args[++i]);
                     break;
