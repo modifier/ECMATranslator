@@ -7,11 +7,11 @@ import org.modifier.scanner.Token;
 public class Parser
 {
     private Scanner scanner;
-    private SyntaxTable table;
+    private AbstractSyntaxTable table;
     private ArrayList<Node> linearTree = new ArrayList<>();
     private Node root;
 
-    public Parser(Scanner scanner, SyntaxTable table)
+    public Parser(Scanner scanner, AbstractSyntaxTable table)
     {
         this.scanner = scanner;
         this.table = table;

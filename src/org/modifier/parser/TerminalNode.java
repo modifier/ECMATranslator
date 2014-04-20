@@ -6,8 +6,14 @@ public class TerminalNode extends Node
 {
     private Token token;
 
-    public TerminalNode(Token token)
+    public TerminalNode(INodeClass nodeClass)
     {
+        super(nodeClass);
+    }
+
+    public TerminalNode(INodeClass nodeClass, Token token)
+    {
+        super(nodeClass);
         this.token = token;
     }
 

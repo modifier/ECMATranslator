@@ -1,0 +1,19 @@
+# Simplified grammar, special for my example with function
+
+function ::= "function" <id> "(" ")" <block>
+block ::= "{" <statements> "}"
+statements ::= | <statements> <statement> ";"
+statement ::= <expression> ";" | <loop> | "break" ";"
+
+loop ::= "for" "(" <expression> ";" <expression> ";" <expression> ")" <block>
+condition ::= "if" "(" expression ")" <block> ( <else> )?
+else ::= "else" <block>
+
+expression ::= <declaration> | <binary_exprssion> | <unary_expression>
+declaration ::= "var" <id> "=" <binary_exprssion>
+binary_exprssion ::= <unary_expression> <binop> <unary_expression>
+unary_expression ::= <unop> <primary_expression> | <primary_expression> <unop>
+primary_expression ::= <id> | <const> | <literal> | <regex>
+
+unop ::= "++" | "--"
+binop ::= "+" | "-" | "*" | "/"

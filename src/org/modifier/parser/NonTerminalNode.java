@@ -6,10 +6,14 @@ public class NonTerminalNode extends Node
 {
     private ArrayList<Node> children = new ArrayList<>();
 
-    public NonTerminalNode() {}
-
-    public NonTerminalNode(ArrayList<Node> children)
+    public NonTerminalNode(INodeClass className)
     {
+        super(className);
+    }
+
+    public NonTerminalNode(INodeClass className, ArrayList<Node> children)
+    {
+        super(className);
         this.children = children;
     }
 
