@@ -39,9 +39,9 @@ public class Scanner implements Iterable<Token> {
             {
                 result.add(matchConst());
             }
-            else if (isQuote(symbol))
+            else if (isLiteral(symbol))
             {
-                result.add(matchQuote());
+                result.add(matchLiteral());
             }
             else if (isRegex(symbol))
             {
@@ -116,7 +116,7 @@ public class Scanner implements Iterable<Token> {
         return getToken(finalString, TokenClass.Const);
     }
 
-    private Token matchQuote()
+    private Token matchLiteral()
     {
         // TODO: there is no line wrapping in javascript
         // TODO: check quotation escaping
@@ -134,7 +134,7 @@ public class Scanner implements Iterable<Token> {
 
         String finalString = accumulator.toString();
 
-        return getToken(finalString, TokenClass.Quote);
+        return getToken(finalString, TokenClass.Literal);
     }
 
     private ArrayList<Token> matchToken()
@@ -219,7 +219,7 @@ public class Scanner implements Iterable<Token> {
         return symbol >= '0' && symbol <= '9';
     }
 
-    private boolean isQuote (char symbol)
+    private boolean isLiteral (char symbol)
     {
         return '"' == symbol || '\n' == symbol;
     }
