@@ -2,7 +2,7 @@
 
 function ::= "function" <id> "(" ")" <block>
 block ::= "{" <statements> "}"
-statements ::= | <statements> <statement> ";"
+statements ::= | <statement> ";" <statements>
 statement ::= <expression> ";" | <loop> | "break" ";"
 
 loop ::= "for" "(" <expression> ";" <expression> ";" <expression> ")" <block>

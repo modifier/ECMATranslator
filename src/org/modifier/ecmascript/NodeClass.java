@@ -4,6 +4,6 @@ import org.modifier.parser.INodeClass;
 
 public enum NodeClass implements INodeClass
 {
-    Function, Block, Statements, Statement, Loop, Condition, Else, Expression, Declaration, BinaryExpression,
-    UnaryExpression, PrimaryExpression, BinaryOperator, UnaryOperator, Identifier, Const, RegEx, Literal
+    Function, Block, Statements, Statement, Loop, Condition, Else, Expression, Declaration, PrimaryExpression,
+    Expression_1
 }
