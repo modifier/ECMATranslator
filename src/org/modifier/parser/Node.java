@@ -26,4 +26,6 @@ public abstract class Node
     {
         return parent;
     }
+
+    abstract public String toString();
 }

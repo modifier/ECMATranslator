@@ -19,17 +19,20 @@ public class Parser
         this.linearTree.add(root);
     }
 
-    public void getTree() throws SyntaxError
+    public Node getTree() throws SyntaxError
     {
         int pointer = 0;
-        Node currentRule = linearTree.get(pointer);
         for(Token currentToken : scanner)
         {
-            do {
+            Node currentRule = linearTree.get(pointer);
+            while (currentRule instanceof NonTerminalNode)
+            {
                 ArrayList<Node> rule = table.getRule(currentToken, currentRule);
+                ((NonTerminalNode) currentRule).setChildren(rule);
+                linearTree.remove(pointer);
                 linearTree.addAll(pointer, rule);
                 currentRule = linearTree.get(pointer);
-            } while (currentRule instanceof NonTerminalNode);
+            }
 
             if (!((TerminalNode)currentRule).fitsToken(currentToken))
             {
@@ -39,5 +42,6 @@ public class Parser
             ((TerminalNode) currentRule).setToken(currentToken);
             pointer++;
         }
+        return this.root;
     }
 }

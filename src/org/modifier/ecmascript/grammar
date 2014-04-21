@@ -2,8 +2,8 @@
 
 function ::= "function" <id> "(" ")" <block>
 block ::= "{" <statements> "}"
-statements ::= | <statement> ";" <statements>
-statement ::= <expression> ";" | <loop> | "break" ";"
+statements ::= | <statement> <statements>
+statement ::= <expression> ";" | "break" ";" | <loop>
 
 loop ::= "for" "(" <expression> ";" <expression> ";" <expression> ")" <block>
 condition ::= "if" "(" expression ")" <block> ( <else> )?

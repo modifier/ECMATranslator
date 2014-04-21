@@ -11,6 +11,12 @@ public class NonTerminalNode extends Node
         super(className);
     }
 
+    @Override
+    public String toString()
+    {
+        return nodeClass.toString();
+    }
+
     public NonTerminalNode(INodeClass className, ArrayList<Node> children)
     {
         super(className);
@@ -20,6 +26,11 @@ public class NonTerminalNode extends Node
     public void appendChild(Node child)
     {
         children.add(child);
+    }
+
+    public void setChildren(ArrayList<Node> children)
+    {
+        this.children = children;
     }
 
     public ArrayList<Node> getChildren()

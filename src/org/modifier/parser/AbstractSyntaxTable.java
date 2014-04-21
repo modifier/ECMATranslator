@@ -5,6 +5,19 @@ import org.modifier.scanner.Token;
 
 public abstract class AbstractSyntaxTable
 {
+    public ArrayList<Node> getRule(Token token, Node node) throws SyntaxError
+    {
+        if (node instanceof NonTerminalNode)
+        {
+            return getRule(token, (NonTerminalNode)node);
+        }
+        else if (node instanceof TerminalNode)
+        {
+            return getRule(token, (TerminalNode)node);
+        }
+        throw new SyntaxError();
+    }
+
     abstract public ArrayList<Node> getRule(Token token, NonTerminalNode currentNode) throws SyntaxError;
 
     public ArrayList<Node> getRule(Token token, TerminalNode currentNode)

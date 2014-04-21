@@ -1,5 +1,7 @@
 package org.modifier.compiler;
 
+import com.sun.java_cup.internal.runtime.lr_parser;
+import org.modifier.ecmascript.SyntaxTable;
 import org.modifier.parser.*;
 import org.modifier.scanner.*;
 
@@ -17,6 +19,22 @@ public class ESCompiler
         org.modifier.scanner.Scanner scanner = new org.modifier.scanner.Scanner(getStringFromInputStream(stream));
         ES5Keywords keywords = new ES5Keywords();
         keywords.reserveWords(scanner);
+
+        AbstractSyntaxTable table = new SyntaxTable();
+        Parser parser = new Parser(scanner, table);
+
+        Node result;
+
+        try
+        {
+            result = parser.getTree();
+
+            printResult(result);
+        }
+        catch (SyntaxError syntaxError)
+        {
+            syntaxError.printStackTrace();
+        }
     }
 
     public static HashMap<String, String> parseOpts (String[] args) throws ParseException
@@ -82,5 +100,42 @@ public class ESCompiler
         }
 
         return sb.toString();
+    }
+
+    private static void printResult(Node result)
+    {
+        printResult(result, 0, false);
+    }
+
+    private static void printResult(Node result, int offset, boolean isLast)
+    {
+        System.out.print(repeatSymbol(" ", offset - 1));
+        if (offset != 0)
+        {
+            System.out.print(isLast ? "└ " : "├ ");
+        }
+        System.out.println(result.toString());
+
+        if (result instanceof TerminalNode)
+        {
+            return;
+        }
+
+        ArrayList<Node> children = ((NonTerminalNode)result).getChildren();
+
+        for (int i = 0; i < children.size(); i++)
+        {
+            printResult(children.get(i), offset + 2, i == children.size() - 1);
+        }
+    }
+
+    private static String repeatSymbol(String symbol, int times)
+    {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < times; i++)
+        {
+            builder.append(symbol);
+        }
+        return builder.toString();
     }
 }

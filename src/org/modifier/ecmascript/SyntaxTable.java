@@ -27,14 +27,17 @@ public class SyntaxTable extends AbstractSyntaxTable
         {
             result.add(new TerminalNode("{"));
             result.add(new NonTerminalNode(NodeClass.Statements));
-            result.add(new TerminalNode(")"));
+            result.add(new TerminalNode("}"));
         }
         else if (nodeClass == NodeClass.Statements)
         {
-            if (
+            if (token.value.equals("for"))
+            {
+                result.add(new NonTerminalNode(NodeClass.Loop));
+            }
+            else if (
                 token.classId == TokenClass.Ident ||
                 token.value.equals("var") ||
-                token.value.equals("for") ||
                 token.value.equals("break")
             )
             {
@@ -45,19 +48,13 @@ public class SyntaxTable extends AbstractSyntaxTable
         }
         else if (nodeClass == NodeClass.Statement)
         {
-            if (token.value.equals("for"))
-            {
-                result.add(new NonTerminalNode(NodeClass.Loop));
-            }
-            else if (token.value.equals("break"))
+            if (token.value.equals("break"))
             {
                 result.add(new TerminalNode("break"));
-                result.add(new TerminalNode(";"));
             }
-            else if (token.classId == TokenClass.Ident || token.value.equals("++") || token.value.equals("--"))
+            else if (token.value.equals("var") || token.classId == TokenClass.Ident || token.value.equals("++") || token.value.equals("--"))
             {
                 result.add(new NonTerminalNode(NodeClass.Expression));
-                result.add(new TerminalNode(";"));
             }
         }
         else if (nodeClass == NodeClass.Loop)
@@ -91,7 +88,10 @@ public class SyntaxTable extends AbstractSyntaxTable
                 result.add(new TerminalNode(TerminalNodeClass.Identifier));
                 result.add(new NonTerminalNode(NodeClass.Expression_1));
             }
-            throw new SyntaxError();
+            else
+            {
+                throw new SyntaxError();
+            }
         }
         else if (nodeClass == NodeClass.Expression_1)
         {
@@ -101,13 +101,16 @@ public class SyntaxTable extends AbstractSyntaxTable
             )
             {
                 result.add(new TerminalNode(token));
-                result.add(new TerminalNode(TerminalNodeClass.Identifier));
+                result.add(new NonTerminalNode(NodeClass.PrimaryExpression));
             }
             else if (token.value.equals("++") || token.value.equals("--"))
             {
                 result.add(new TerminalNode(token));
             }
-            throw new SyntaxError();
+            else
+            {
+                throw new SyntaxError();
+            }
         }
         else if (nodeClass == NodeClass.PrimaryExpression)
         {
