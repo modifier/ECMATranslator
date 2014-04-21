@@ -1,10 +1,8 @@
 package org.modifier.scanner;
 
-import org.modifier.scanner.TokenClass;
-
 public class Token {
     public final String value;
-    public final TokenClass classId;
+    public final ITokenClass classId;
 
     public Token (String value)
     {
@@ -12,7 +10,7 @@ public class Token {
         this.classId = TokenClass.Other;
     }
 
-    public Token (String value, TokenClass classId) {
+    public Token (String value, ITokenClass classId) {
         this.value = value;
         this.classId = classId;
     }

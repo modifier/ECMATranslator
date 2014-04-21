@@ -5,27 +5,16 @@ import java.util.ArrayList;
 public class NonTerminalNode extends Node
 {
     private ArrayList<Node> children = new ArrayList<>();
+    private INodeClass nodeClass;
 
     public NonTerminalNode(INodeClass className)
     {
-        super(className);
+        nodeClass = className;
     }
 
-    @Override
-    public String toString()
+    public INodeClass getNodeClass()
     {
-        return nodeClass.toString();
-    }
-
-    public NonTerminalNode(INodeClass className, ArrayList<Node> children)
-    {
-        super(className);
-        this.children = children;
-    }
-
-    public void appendChild(Node child)
-    {
-        children.add(child);
+        return nodeClass;
     }
 
     public void setChildren(ArrayList<Node> children)
@@ -36,5 +25,11 @@ public class NonTerminalNode extends Node
     public ArrayList<Node> getChildren()
     {
         return children;
+    }
+
+    @Override
+    public String toString()
+    {
+        return nodeClass.toString();
     }
 }

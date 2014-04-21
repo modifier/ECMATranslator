@@ -1,21 +1,28 @@
 package org.modifier.parser;
 
+import org.modifier.scanner.ITokenClass;
 import org.modifier.scanner.Token;
 import org.modifier.scanner.TokenClass;
 
 public class TerminalNode extends Node
 {
     private Token token;
+    private ITokenClass nodeClass;
 
     public TerminalNode(String value)
     {
-        super(TerminalNodeClass.Other);
+        this.nodeClass = TokenClass.Other;
         token = new Token(value);
     }
 
-    public TerminalNode(INodeClass nodeClass)
+    public TerminalNode(ITokenClass nodeClass)
     {
-        super(nodeClass);
+        this.nodeClass = nodeClass;
+    }
+
+    public ITokenClass getNodeClass()
+    {
+        return nodeClass;
     }
 
     @Override
@@ -30,26 +37,7 @@ public class TerminalNode extends Node
 
     public TerminalNode(Token token)
     {
-        if (token.classId == TokenClass.Ident)
-        {
-            nodeClass = TerminalNodeClass.Identifier;
-        }
-        else if (token.classId == TokenClass.Const)
-        {
-            nodeClass = TerminalNodeClass.Const;
-        }
-        else if (token.classId == TokenClass.Literal)
-        {
-            nodeClass = TerminalNodeClass.Literal;
-        }
-        else if (token.classId == TokenClass.Regex)
-        {
-            nodeClass = TerminalNodeClass.RegEx;
-        }
-        else
-        {
-            nodeClass = TerminalNodeClass.Other;
-        }
+        nodeClass = token.classId;
         this.token = token;
     }
 
@@ -65,27 +53,11 @@ public class TerminalNode extends Node
 
     public boolean fitsToken(Token token)
     {
-        if (token.classId == TokenClass.Other && nodeClass == TerminalNodeClass.Other)
+        if (token.classId == TokenClass.Other && nodeClass == TokenClass.Other)
         {
             return token.value.equals(this.token.value);
         }
-        else if (token.classId == TokenClass.Ident && nodeClass == TerminalNodeClass.Identifier)
-        {
-            return true;
-        }
-        else if (token.classId == TokenClass.Const && nodeClass == TerminalNodeClass.Const)
-        {
-            return true;
-        }
-        else if (token.classId == TokenClass.Literal && nodeClass == TerminalNodeClass.Literal)
-        {
-            return true;
-        }
-        else if (token.classId == TokenClass.Regex && nodeClass == TerminalNodeClass.RegEx)
-        {
-            return true;
-        }
 
-        return false;
+        return token.classId == nodeClass;
     }
 }

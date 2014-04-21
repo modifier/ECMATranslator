@@ -1,4 +1,4 @@
-package org.modifier.scanner;
+package org.modifier.ecmascript;
 
 import org.modifier.scanner.KeywordInjector;
 import org.modifier.scanner.Scanner;

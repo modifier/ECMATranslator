@@ -9,7 +9,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
-public class Scanner implements Iterable<Token> {
+public class Scanner implements Iterable<Token>
+{
     private final HashMap<String, Token> tokenList = new HashMap<>();
     private final String stream;
 

@@ -1,9 +1,10 @@
 package org.modifier.compiler;
 
-import com.sun.java_cup.internal.runtime.lr_parser;
+import org.modifier.ecmascript.ES5Keywords;
+import org.modifier.ecmascript.Lexer;
 import org.modifier.ecmascript.SyntaxTable;
 import org.modifier.parser.*;
-import org.modifier.scanner.*;
+import org.modifier.scanner.Scanner;
 
 import java.io.*;
 import java.text.ParseException;
@@ -16,12 +17,14 @@ public class ESCompiler
         Map<String, String> opts = parseOpts(args);
         InputStream stream = new FileInputStream(opts.get("i"));
 
-        org.modifier.scanner.Scanner scanner = new org.modifier.scanner.Scanner(getStringFromInputStream(stream));
+        Scanner scanner = new Scanner(getStringFromInputStream(stream));
         ES5Keywords keywords = new ES5Keywords();
         keywords.reserveWords(scanner);
 
+        Lexer lexer = new Lexer(scanner);
+
         AbstractSyntaxTable table = new SyntaxTable();
-        Parser parser = new Parser(scanner, table);
+        Parser parser = new Parser(lexer, table);
 
         Node result;
 

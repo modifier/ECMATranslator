@@ -1,17 +1,16 @@
 package org.modifier.parser;
 
 import java.util.ArrayList;
-import org.modifier.scanner.Scanner;
 import org.modifier.scanner.Token;
 
 public class Parser
 {
-    private Scanner scanner;
+    private Iterable<Token> scanner;
     private AbstractSyntaxTable table;
     private ArrayList<Node> linearTree = new ArrayList<>();
     private Node root;
 
-    public Parser(Scanner scanner, AbstractSyntaxTable table)
+    public Parser(Iterable<Token> scanner, AbstractSyntaxTable table)
     {
         this.scanner = scanner;
         this.table = table;

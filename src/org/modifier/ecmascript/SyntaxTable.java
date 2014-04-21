@@ -18,7 +18,7 @@ public class SyntaxTable extends AbstractSyntaxTable
         if (nodeClass == NodeClass.Function)
         {
             result.add(new TerminalNode("function"));
-            result.add(new TerminalNode(TerminalNodeClass.Identifier));
+            result.add(new TerminalNode(TokenClass.Ident));
             result.add(new TerminalNode("("));
             result.add(new TerminalNode(")"));
             result.add(new NonTerminalNode(NodeClass.Block));
@@ -74,18 +74,18 @@ public class SyntaxTable extends AbstractSyntaxTable
             if (token.value.equals("var"))
             {
                 result.add(new TerminalNode("var"));
-                result.add(new TerminalNode(TerminalNodeClass.Identifier));
+                result.add(new TerminalNode(TokenClass.Ident));
                 result.add(new TerminalNode("="));
                 result.add(new NonTerminalNode(NodeClass.PrimaryExpression));
             }
-            else if (token.value.equals("++") || token.value.equals("--"))
+            else if (token.classId == TerminalClass.UnaryOperator)
             {
-                result.add(new TerminalNode(token));
+                result.add(new TerminalNode(TerminalClass.UnaryOperator));
                 result.add(new NonTerminalNode(NodeClass.PrimaryExpression));
             }
             else if (token.classId == TokenClass.Ident)
             {
-                result.add(new TerminalNode(TerminalNodeClass.Identifier));
+                result.add(new TerminalNode(TokenClass.Ident));
                 result.add(new NonTerminalNode(NodeClass.Expression_1));
             }
             else
@@ -95,17 +95,14 @@ public class SyntaxTable extends AbstractSyntaxTable
         }
         else if (nodeClass == NodeClass.Expression_1)
         {
-            if (token.value.equals("+") || token.value.equals("-") || token.value.equals("*") ||
-                token.value.equals("/") || token.value.equals("<") || token.value.equals(">") ||
-                token.value.equals("==")
-            )
+            if (token.classId == TerminalClass.BinaryOperator)
             {
-                result.add(new TerminalNode(token));
+                result.add(new TerminalNode(TerminalClass.BinaryOperator));
                 result.add(new NonTerminalNode(NodeClass.PrimaryExpression));
             }
-            else if (token.value.equals("++") || token.value.equals("--"))
+            else if (token.classId == TerminalClass.UnaryOperator)
             {
-                result.add(new TerminalNode(token));
+                result.add(new TerminalNode(TerminalClass.UnaryOperator));
             }
             else
             {
