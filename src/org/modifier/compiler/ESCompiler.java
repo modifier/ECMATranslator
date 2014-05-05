@@ -1,6 +1,5 @@
 package org.modifier.compiler;
 
-import org.modifier.ecmascript.ES5Keywords;
 import org.modifier.ecmascript.Lexer;
 import org.modifier.ecmascript.SyntaxTable;
 import org.modifier.parser.*;
@@ -12,14 +11,55 @@ import java.util.*;
 
 public class ESCompiler
 {
+    private static String[] keywords = new String[] {
+            "break",
+            "case",
+            "catch",
+            "continue",
+            "debugger",
+            "default",
+            "delete",
+            "do",
+            "else",
+            "finally",
+            "for",
+            "function",
+            "if",
+            "in",
+            "instanceof",
+            "new",
+            "return",
+            "switch",
+            "this",
+            "throw",
+            "try",
+            "typeof",
+            "var",
+            "void",
+            "while",
+            "with",
+            "++",
+            "--",
+            "+=",
+            "-=",
+            "<<",
+            ">>",
+            ">=",
+            "<=",
+            "==",
+            "==="
+    };
+
     public static void main (String[] args) throws ParseException, FileNotFoundException
     {
         Map<String, String> opts = parseOpts(args);
         InputStream stream = new FileInputStream(opts.get("i"));
 
         Scanner scanner = new Scanner(getStringFromInputStream(stream));
-        ES5Keywords keywords = new ES5Keywords();
-        keywords.reserveWords(scanner);
+        for (String word : keywords)
+        {
+            scanner.reserve(word);
+        }
 
         Lexer lexer = new Lexer(scanner);
 
