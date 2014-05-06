@@ -4,6 +4,7 @@ import org.modifier.ecmascript.Lexer;
 import org.modifier.ecmascript.SyntaxTable;
 import org.modifier.parser.*;
 import org.modifier.scanner.Scanner;
+import org.modifier.utils.TerminalReader;
 
 import java.io.*;
 import java.text.ParseException;
@@ -11,52 +12,27 @@ import java.util.*;
 
 public class ESCompiler
 {
-    private static String[] keywords = new String[] {
-            "break",
-            "case",
-            "catch",
-            "continue",
-            "debugger",
-            "default",
-            "delete",
-            "do",
-            "else",
-            "finally",
-            "for",
-            "function",
-            "if",
-            "in",
-            "instanceof",
-            "new",
-            "return",
-            "switch",
-            "this",
-            "throw",
-            "try",
-            "typeof",
-            "var",
-            "void",
-            "while",
-            "with",
-            "++",
-            "--",
-            "+=",
-            "-=",
-            "<<",
-            ">>",
-            ">=",
-            "<=",
-            "==",
-            "==="
-    };
-
     public static void main (String[] args) throws ParseException, FileNotFoundException
     {
         Map<String, String> opts = parseOpts(args);
         InputStream stream = new FileInputStream(opts.get("i"));
 
+        InputStream grammar = new FileInputStream(opts.get("g"));
+
+        TerminalReader reader;
+        try
+        {
+            reader = new TerminalReader(getStringFromInputStream(grammar));
+        }
+        catch (Exception exception)
+        {
+            // TODO: Handle exceptions
+            exception.printStackTrace();
+            return;
+        }
+
         Scanner scanner = new Scanner(getStringFromInputStream(stream));
-        for (String word : keywords)
+        for (String word : reader.getKeywords())
         {
             scanner.reserve(word);
         }
@@ -76,6 +52,7 @@ public class ESCompiler
         }
         catch (SyntaxError syntaxError)
         {
+            // TODO: Handle exceptions
             syntaxError.printStackTrace();
         }
     }
@@ -95,6 +72,10 @@ public class ESCompiler
 
                 case "-o":
                     result.put("o", args[++i]);
+                    break;
+
+                case "-g":
+                    result.put("g", args[++i]);
                     break;
 
                 default:

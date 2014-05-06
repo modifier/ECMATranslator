@@ -170,6 +170,11 @@ public class Scanner implements Iterable<Token>
         }
         while (!isWhitespace(getLookahead()) && !isAlpha(getLookahead()) && !isDigit(getLookahead()) && (0 != keys.size()));
 
+        if (keys.size() > 1)
+        {
+            tokenStrings.add(accumulator.toString());
+        }
+
         for (String tokenString : tokenStrings) {
             result.add(getToken(tokenString, TokenClass.Other));
         }
