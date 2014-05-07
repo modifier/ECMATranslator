@@ -145,12 +145,14 @@ public class Scanner implements Iterable<Token>
         FilteredSet keys = new FilteredSet(tokenList.keySet());
 
         ArrayList<String> tokenStrings = new ArrayList<>();
+        boolean added = false;
 
         do
         {
             symbol = stream.charAt(position++);
             accumulator.append(symbol);
 
+            // TODO: make correct fallback to values longer than 1 symbol
             if (!keys.containsPartialKey(accumulator.toString()))
             {
                 String tokenString = accumulator.toString();
@@ -158,16 +160,18 @@ public class Scanner implements Iterable<Token>
                 {
                     tokenStrings.add(String.valueOf(tokenString.charAt(i)));
                 }
+                added = true;
             }
 
             if (1 == keys.size() && keys.contains(accumulator.toString())) {
                 tokenStrings.add(accumulator.toString());
+                added = true;
                 break;
             }
         }
         while (!isWhitespace(getLookahead()) && !isAlpha(getLookahead()) && !isDigit(getLookahead()) && (0 != keys.size()));
 
-        if (keys.size() > 1)
+        if (keys.size() >= 1 && !added)
         {
             tokenStrings.add(accumulator.toString());
         }

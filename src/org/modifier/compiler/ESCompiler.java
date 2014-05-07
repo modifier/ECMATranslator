@@ -1,8 +1,8 @@
 package org.modifier.compiler;
 
-import org.modifier.ecmascript.Lexer;
 import org.modifier.ecmascript.SyntaxTable;
 import org.modifier.parser.*;
+import org.modifier.scanner.Lexer;
 import org.modifier.scanner.Scanner;
 import org.modifier.utils.TerminalReader;
 
@@ -38,6 +38,7 @@ public class ESCompiler
         }
 
         Lexer lexer = new Lexer(scanner);
+        lexer.setCorrespondence(reader.getCorrespondence());
 
         AbstractSyntaxTable table = new SyntaxTable();
         Parser parser = new Parser(lexer, table);

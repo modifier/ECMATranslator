@@ -18,6 +18,11 @@ public class TerminalReader
         String[] rows = input.split("\n");
         for (String row : rows)
         {
+            if (row.trim().startsWith("#"))
+            {
+                continue;
+            }
+
             if (!row.contains("::="))
             {
                 int start = row.indexOf("\"");
