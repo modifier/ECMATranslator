@@ -218,7 +218,7 @@ public class Scanner implements Iterable<Token>
 
     private boolean isAlpha (char symbol)
     {
-        return (symbol >= 'A' && symbol <= 'Z') || (symbol >= 'a' && symbol <= 'z');
+        return (symbol >= 'A' && symbol <= 'Z') || (symbol >= 'a' && symbol <= 'z') || (symbol == '_') || (symbol == '$');
     }
 
     private boolean isDigit (char symbol)
