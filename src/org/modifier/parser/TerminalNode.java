@@ -1,26 +1,25 @@
 package org.modifier.parser;
 
-import org.modifier.scanner.ITokenClass;
 import org.modifier.scanner.Token;
 import org.modifier.scanner.TokenClass;
 
 public class TerminalNode extends Node
 {
     private Token token;
-    private ITokenClass nodeClass;
+    private TokenClass nodeClass;
 
     public TerminalNode(String value)
     {
-        this.nodeClass = TokenClass.Other;
+        this.nodeClass = TokenClass.get("Other");
         token = new Token(value);
     }
 
-    public TerminalNode(ITokenClass nodeClass)
+    public TerminalNode(TokenClass nodeClass)
     {
         this.nodeClass = nodeClass;
     }
 
-    public ITokenClass getNodeClass()
+    public TokenClass getNodeClass()
     {
         return nodeClass;
     }
@@ -53,7 +52,7 @@ public class TerminalNode extends Node
 
     public boolean fitsToken(Token token)
     {
-        if (token.classId == TokenClass.Other && nodeClass == TokenClass.Other)
+        if (token.classId == TokenClass.get("Other") && nodeClass == TokenClass.get("Other"))
         {
             return token.value.equals(this.token.value);
         }

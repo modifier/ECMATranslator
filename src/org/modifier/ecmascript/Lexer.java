@@ -15,7 +15,7 @@ public class Lexer extends AbstractLexer
     @Override
     protected Token convertToken(Token token)
     {
-        if (token.classId != TokenClass.Other)
+        if (token.classId != TokenClass.get("Other"))
         {
             return token;
         }
@@ -24,12 +24,12 @@ public class Lexer extends AbstractLexer
             token.value.equals("-") || token.value.equals("/") || token.value.equals("*") ||
             token.value.equals("==") || token.value.equals(">=") || token.value.equals("<=")
         ) {
-            return new Token (token.value, TerminalClass.BinaryOperator);
+            return new Token (token.value, TokenClass.get("BinaryOperator"));
         }
 
         if (token.value.equals("++") || token.value.equals("--"))
         {
-            return new Token (token.value, TerminalClass.UnaryOperator);
+            return new Token (token.value, TokenClass.get("UnaryOperator"));
         }
 
         return token;

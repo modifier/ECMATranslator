@@ -2,15 +2,15 @@ package org.modifier.scanner;
 
 public class Token {
     public final String value;
-    public final ITokenClass classId;
+    public final TokenClass classId;
 
     public Token (String value)
     {
         this.value = value;
-        this.classId = TokenClass.Other;
+        this.classId = TokenClass.get("Other");
     }
 
-    public Token (String value, ITokenClass classId) {
+    public Token (String value, TokenClass classId) {
         this.value = value;
         this.classId = classId;
     }

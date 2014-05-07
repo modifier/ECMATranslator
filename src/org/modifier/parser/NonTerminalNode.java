@@ -1,20 +1,22 @@
 package org.modifier.parser;
 
+import org.modifier.scanner.TokenClass;
+
 import java.util.ArrayList;
 
 public class NonTerminalNode extends Node
 {
     private ArrayList<Node> children = new ArrayList<>();
-    private INodeClass nodeClass;
+    private TokenClass tokenClass;
 
-    public NonTerminalNode(INodeClass className)
+    public NonTerminalNode(TokenClass className)
     {
-        nodeClass = className;
+        tokenClass = className;
     }
 
-    public INodeClass getNodeClass()
+    public TokenClass getTokenClass()
     {
-        return nodeClass;
+        return tokenClass;
     }
 
     public void setChildren(ArrayList<Node> children)
@@ -30,6 +32,6 @@ public class NonTerminalNode extends Node
     @Override
     public String toString()
     {
-        return nodeClass.toString();
+        return tokenClass.toString();
     }
 }

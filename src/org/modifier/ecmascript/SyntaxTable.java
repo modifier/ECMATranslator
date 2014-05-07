@@ -12,106 +12,106 @@ public class SyntaxTable extends AbstractSyntaxTable
     @Override
     public ArrayList<Node> getRule(Token token, NonTerminalNode currentNode) throws SyntaxError
     {
-        INodeClass nodeClass = currentNode.getNodeClass();
+        TokenClass nodeClass = currentNode.getTokenClass();
         ArrayList<Node> result = new ArrayList<>();
 
-        if (nodeClass == NodeClass.Function)
+        if (nodeClass == TokenClass.get("Function"))
         {
             result.add(new TerminalNode("function"));
-            result.add(new TerminalNode(TokenClass.Ident));
+            result.add(new TerminalNode(TokenClass.get("Ident")));
             result.add(new TerminalNode("("));
             result.add(new TerminalNode(")"));
-            result.add(new NonTerminalNode(NodeClass.Block));
+            result.add(new NonTerminalNode(TokenClass.get("Block")));
         }
-        else if (nodeClass == NodeClass.Block)
+        else if (nodeClass == TokenClass.get("Block"))
         {
             result.add(new TerminalNode("{"));
-            result.add(new NonTerminalNode(NodeClass.Statements));
+            result.add(new NonTerminalNode(TokenClass.get("Statements")));
             result.add(new TerminalNode("}"));
         }
-        else if (nodeClass == NodeClass.Statements)
+        else if (nodeClass == TokenClass.get("Statements"))
         {
             if (token.value.equals("for"))
             {
-                result.add(new NonTerminalNode(NodeClass.Loop));
+                result.add(new NonTerminalNode(TokenClass.get("Loop")));
             }
             else if (
-                token.classId == TokenClass.Ident ||
+                token.classId == TokenClass.get("Ident") ||
                 token.value.equals("var") ||
                 token.value.equals("break")
             )
             {
-                result.add(new NonTerminalNode(NodeClass.Statement));
+                result.add(new NonTerminalNode(TokenClass.get("Statement")));
                 result.add(new TerminalNode(";"));
-                result.add(new NonTerminalNode(NodeClass.Statements));
+                result.add(new NonTerminalNode(TokenClass.get("Statements")));
             }
         }
-        else if (nodeClass == NodeClass.Statement)
+        else if (nodeClass == TokenClass.get("Statement"))
         {
             if (token.value.equals("break"))
             {
                 result.add(new TerminalNode("break"));
             }
-            else if (token.value.equals("var") || token.classId == TokenClass.Ident || token.value.equals("++") || token.value.equals("--"))
+            else if (token.value.equals("var") || token.classId == TokenClass.get("Ident") || token.value.equals("++") || token.value.equals("--"))
             {
-                result.add(new NonTerminalNode(NodeClass.Expression));
+                result.add(new NonTerminalNode(TokenClass.get("Expression")));
             }
         }
-        else if (nodeClass == NodeClass.Loop)
+        else if (nodeClass == TokenClass.get("Loop"))
         {
             result.add(new TerminalNode("for"));
             result.add(new TerminalNode("("));
-            result.add(new NonTerminalNode(NodeClass.Expression));
+            result.add(new NonTerminalNode(TokenClass.get("Expression")));
             result.add(new TerminalNode(";"));
-            result.add(new NonTerminalNode(NodeClass.Expression));
+            result.add(new NonTerminalNode(TokenClass.get("Expression")));
             result.add(new TerminalNode(";"));
-            result.add(new NonTerminalNode(NodeClass.Expression));
+            result.add(new NonTerminalNode(TokenClass.get("Expression")));
             result.add(new TerminalNode(")"));
-            result.add(new NonTerminalNode(NodeClass.Block));
+            result.add(new NonTerminalNode(TokenClass.get("Block")));
         }
-        else if (nodeClass == NodeClass.Expression)
+        else if (nodeClass == TokenClass.get("Expression"))
         {
             if (token.value.equals("var"))
             {
                 result.add(new TerminalNode("var"));
-                result.add(new TerminalNode(TokenClass.Ident));
+                result.add(new TerminalNode(TokenClass.get("Ident")));
                 result.add(new TerminalNode("="));
-                result.add(new NonTerminalNode(NodeClass.PrimaryExpression));
+                result.add(new NonTerminalNode(TokenClass.get("PrimaryExpression")));
             }
-            else if (token.classId == TerminalClass.UnaryOperator)
+            else if (token.classId == TokenClass.get("UnaryOperator"))
             {
-                result.add(new TerminalNode(TerminalClass.UnaryOperator));
-                result.add(new NonTerminalNode(NodeClass.PrimaryExpression));
+                result.add(new TerminalNode(TokenClass.get("UnaryOperator")));
+                result.add(new NonTerminalNode(TokenClass.get("PrimaryExpression")));
             }
-            else if (token.classId == TokenClass.Ident)
+            else if (token.classId == TokenClass.get("Ident"))
             {
-                result.add(new TerminalNode(TokenClass.Ident));
-                result.add(new NonTerminalNode(NodeClass.Expression_1));
+                result.add(new TerminalNode(TokenClass.get("Ident")));
+                result.add(new NonTerminalNode(TokenClass.get("Expression_1")));
             }
             else
             {
                 throw new SyntaxError();
             }
         }
-        else if (nodeClass == NodeClass.Expression_1)
+        else if (nodeClass == TokenClass.get("Expression_1"))
         {
-            if (token.classId == TerminalClass.BinaryOperator)
+            if (token.classId == TokenClass.get("BinaryOperator"))
             {
-                result.add(new TerminalNode(TerminalClass.BinaryOperator));
-                result.add(new NonTerminalNode(NodeClass.PrimaryExpression));
+                result.add(new TerminalNode(TokenClass.get("BinaryOperator")));
+                result.add(new NonTerminalNode(TokenClass.get("PrimaryExpression")));
             }
-            else if (token.classId == TerminalClass.UnaryOperator)
+            else if (token.classId == TokenClass.get("UnaryOperator"))
             {
-                result.add(new TerminalNode(TerminalClass.UnaryOperator));
+                result.add(new TerminalNode(TokenClass.get("UnaryOperator")));
             }
             else
             {
                 throw new SyntaxError();
             }
         }
-        else if (nodeClass == NodeClass.PrimaryExpression)
+        else if (nodeClass == TokenClass.get("PrimaryExpression"))
         {
-            if (token.classId == TokenClass.Other)
+            if (token.classId == TokenClass.get("Other"))
             {
                 throw new SyntaxError();
             }
@@ -127,6 +127,6 @@ public class SyntaxTable extends AbstractSyntaxTable
     @Override
     public Node getRoot()
     {
-        return new NonTerminalNode(NodeClass.Function);
+        return new NonTerminalNode(TokenClass.get("Function"));
     }
 }

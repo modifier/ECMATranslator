@@ -1,8 +1,5 @@
 package org.modifier.scanner;
 
-import org.modifier.scanner.Token;
-import org.modifier.scanner.TokenClass;
-import org.modifier.scanner.TokenGenerator;
 import org.modifier.utils.FilteredSet;
 
 import java.util.ArrayList;
@@ -92,7 +89,7 @@ public class Scanner implements Iterable<Token>
 
         String finalString = accumulator.toString();
 
-        return getToken(finalString, TokenClass.Ident);
+        return getToken(finalString, TokenClass.get("Ident"));
     }
 
     private Token matchConst()
@@ -114,7 +111,7 @@ public class Scanner implements Iterable<Token>
 
         String finalString = accumulator.toString();
 
-        return getToken(finalString, TokenClass.Const);
+        return getToken(finalString, TokenClass.get("Const"));
     }
 
     private Token matchLiteral()
@@ -135,7 +132,7 @@ public class Scanner implements Iterable<Token>
 
         String finalString = accumulator.toString();
 
-        return getToken(finalString, TokenClass.Literal);
+        return getToken(finalString, TokenClass.get("Literal"));
     }
 
     private ArrayList<Token> matchToken()
@@ -176,7 +173,7 @@ public class Scanner implements Iterable<Token>
         }
 
         for (String tokenString : tokenStrings) {
-            result.add(getToken(tokenString, TokenClass.Other));
+            result.add(getToken(tokenString, TokenClass.get("Other")));
         }
 
         return result;
@@ -252,6 +249,6 @@ public class Scanner implements Iterable<Token>
 
     public void reserve (String keyword)
     {
-        tokenList.put(keyword, new Token(keyword, TokenClass.Other));
+        tokenList.put(keyword, new Token(keyword, TokenClass.get("Other")));
     }
 }
