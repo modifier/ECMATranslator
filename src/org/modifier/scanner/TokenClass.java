@@ -17,6 +17,16 @@ public class TokenClass
         return name;
     }
 
+    public boolean fits (Token token) throws Exception
+    {
+        if (name.equals("AssignmentExpression"))
+        {
+            // TODO: temp
+            return token.classId == get("Ident");
+        }
+        throw new Exception();
+    }
+
     public static TokenClass get (String name)
     {
         if (!nonTerminals.containsKey(name))

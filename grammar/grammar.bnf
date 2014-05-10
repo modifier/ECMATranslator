@@ -44,33 +44,22 @@ ShiftExpression	::=	AdditiveExpression ( ShiftOperator AdditiveExpression )*
 ShiftOperator	::=	( "<<" | ">>" | ">>>" )
 RelationalExpression	::=	ShiftExpression ( RelationalOperator ShiftExpression )*
 RelationalOperator	::=	( "<" | ">" | "<=" | ">=" | "instanceof" | "in" )
-RelationalExpressionNoIn	::=	ShiftExpression ( RelationalNoInOperator ShiftExpression )*
-RelationalNoInOperator	::=	( "<" | ">" | "<=" | ">=" | "instanceof" )
 EqualityExpression	::=	RelationalExpression ( EqualityOperator RelationalExpression )*
-EqualityExpressionNoIn	::=	RelationalExpressionNoIn ( EqualityOperator RelationalExpressionNoIn )*
 EqualityOperator	::=	( "==" | "!=" | "===" | "!==" )
 BitwiseANDExpression	::=	EqualityExpression ( BitwiseANDOperator EqualityExpression )*
-BitwiseANDExpressionNoIn	::=	EqualityExpressionNoIn ( BitwiseANDOperator EqualityExpressionNoIn )*
 BitwiseANDOperator	::=	"&"
 BitwiseXORExpression	::=	BitwiseANDExpression ( BitwiseXOROperator BitwiseANDExpression )*
-BitwiseXORExpressionNoIn	::=	BitwiseANDExpressionNoIn ( BitwiseXOROperator BitwiseANDExpressionNoIn )*
 BitwiseXOROperator	::=	"^"
 BitwiseORExpression	::=	BitwiseXORExpression ( BitwiseOROperator BitwiseXORExpression )*
-BitwiseORExpressionNoIn	::=	BitwiseXORExpressionNoIn ( BitwiseOROperator BitwiseXORExpressionNoIn )*
 BitwiseOROperator	::=	"|"
 LogicalANDExpression	::=	BitwiseORExpression ( LogicalANDOperator BitwiseORExpression )*
-LogicalANDExpressionNoIn	::=	BitwiseORExpressionNoIn ( LogicalANDOperator BitwiseORExpressionNoIn )*
 LogicalANDOperator	::=	"&&"
 LogicalORExpression	::=	LogicalANDExpression ( LogicalOROperator LogicalANDExpression )*
-LogicalORExpressionNoIn	::=	LogicalANDExpressionNoIn ( LogicalOROperator LogicalANDExpressionNoIn )*
 LogicalOROperator	::=	"||"
 ConditionalExpression	::=	LogicalORExpression ( "?" AssignmentExpression ":" AssignmentExpression )?
-ConditionalExpressionNoIn	::=	LogicalORExpressionNoIn ( "?" AssignmentExpression ":" AssignmentExpressionNoIn )?
 AssignmentExpression	::=	( LeftHandSideExpression AssignmentOperator AssignmentExpression | ConditionalExpression )
-AssignmentExpressionNoIn	::=	( LeftHandSideExpression AssignmentOperator AssignmentExpressionNoIn | ConditionalExpressionNoIn )
 AssignmentOperator	::=	( "=" | "*=" | <SLASHASSIGN> | "%=" | "+=" | "-=" | "<<=" | ">>=" | ">>>=" | "&=" | "^=" | "|=" )
 Expression	::=	AssignmentExpression ( "," AssignmentExpression )*
-ExpressionNoIn	::=	AssignmentExpressionNoIn ( "," AssignmentExpressionNoIn )*
 Statement	::=	Block
             |	VariableStatement
             |	EmptyStatement
@@ -90,19 +79,16 @@ Block	::=	"{" ( StatementList )? "}"
 StatementList	::=	( Statement )+
 VariableStatement	::=	"var" VariableDeclarationList ( ";" )?
 VariableDeclarationList	::=	VariableDeclaration ( "," VariableDeclaration )*
-VariableDeclarationListNoIn	::=	VariableDeclarationNoIn ( "," VariableDeclarationNoIn )*
 VariableDeclaration	::=	Identifier ( Initialiser )?
-VariableDeclarationNoIn	::=	Identifier ( InitialiserNoIn )?
 Initialiser	::=	"=" AssignmentExpression
-InitialiserNoIn	::=	"=" AssignmentExpressionNoIn
 EmptyStatement	::=	";"
 ExpressionStatement	::=	Expression ( ";" )?
 IfStatement	::=	"if" "(" Expression ")" Statement ( "else" Statement )?
 IterationStatement	::=	( "do" Statement "while" "(" Expression ")" ( ";" )? )
                     |	( "while" "(" Expression ")" Statement )
-                    |	( "for" "(" ( ExpressionNoIn )? ";" ( Expression )? ";" ( Expression )? ")" Statement )
+                    |	( "for" "(" ( Expression )? ";" ( Expression )? ";" ( Expression )? ")" Statement )
                     |	( "for" "(" "var" VariableDeclarationList ";" ( Expression )? ";" ( Expression )? ")" Statement )
-                    |	( "for" "(" "var" VariableDeclarationNoIn "in" Expression ")" Statement )
+                    |	( "for" "(" "var" VariableDeclaration "in" Expression ")" Statement )
                     |	( "for" "(" LeftHandSideExpressionForIn "in" Expression ")" Statement )
 ContinueStatement	::=	"continue" ( Identifier )? ( ";" )?
 BreakStatement	::=	"break" ( Identifier )? ( ";" )?
