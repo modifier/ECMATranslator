@@ -1,4 +1,17 @@
+var duck = 5;
+
+expression();
+
+function Duck (arg1 = 15, arg2 = (function () { expression(); }))
 {
+    console.log("I like ducks");
+}
+
+var duck = 1, crack, snack = new Duck("meat", 15);
+
+duck = 8;
+
+crack = {
     "test1": duck + 100500,
     "test2": hits / 255 + 55 - 255,
     "test3": allelujah[3],
@@ -13,4 +26,4 @@
     "test10": hits()[11],
     "test11": (11 + 5) / 2,
     "test12": new hits(arg1, arg2)[new shit(255 - 314 / 155)]
-}
+};

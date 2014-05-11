@@ -147,6 +147,12 @@ public class SyntaxTable extends AbstractSyntaxTable
                 result.add(new NonTerminalNode(TokenClass.get("UnaryExpression")));
                 result.add(new NonTerminalNode(TokenClass.get("BinaryExpression")));
             }
+            else if (token.value.equals("="))
+            {
+                result.add(new TerminalNode("="));
+                result.add(new NonTerminalNode(TokenClass.get("UnaryExpression")));
+                result.add(new NonTerminalNode(TokenClass.get("BinaryExpression")));
+            }
             else if (token.classId == TokenClass.get("AssignmentOperator"))
             {
                 result.add(new TerminalNode(TokenClass.get("AssignmentOperator")));
@@ -227,6 +233,119 @@ public class SyntaxTable extends AbstractSyntaxTable
             result.add(new TerminalNode("new"));
             result.add(new NonTerminalNode(TokenClass.get("MemberExpression")));
         }
+        else if (nodeClass == TokenClass.get("FunctionExpression"))
+        {
+            result.add(new TerminalNode("function"));
+            result.add(new NonTerminalNode(TokenClass.get("FunctionExpression_1")));
+        }
+        else if (nodeClass == TokenClass.get("FunctionExpression_1"))
+        {
+            if (token.classId == TokenClass.get("Ident"))
+            {
+                result.add(new TerminalNode(TokenClass.get("Ident")));
+            }
+
+            // TODO: implement default values in functions
+            result.add(new TerminalNode("("));
+            result.add(new NonTerminalNode(TokenClass.get("Expression")));
+            result.add(new TerminalNode(")"));
+            result.add(new TerminalNode("{"));
+            result.add(new NonTerminalNode(TokenClass.get("SourceElements")));
+            result.add(new TerminalNode("}"));
+        }
+        else if (nodeClass == TokenClass.get("FunctionDeclaration"))
+        {
+            result.add(new TerminalNode("function"));
+            result.add(new TerminalNode(TokenClass.get("Ident")));
+
+            // TODO: implement default values in functions
+            result.add(new TerminalNode("("));
+            result.add(new NonTerminalNode(TokenClass.get("Expression")));
+            result.add(new TerminalNode(")"));
+            result.add(new TerminalNode("{"));
+            result.add(new NonTerminalNode(TokenClass.get("SourceElements")));
+            result.add(new TerminalNode("}"));
+        }
+        else if (nodeClass == TokenClass.get("SourceElements"))
+        {
+            if (token.classId == TokenClass.get("<EOF>") || token.value.equals("}"))
+            {
+                return result;
+            }
+            result.add(new NonTerminalNode(TokenClass.get("SourceElement")));
+        }
+        else if (nodeClass == TokenClass.get("SourceElement"))
+        {
+            if (token.value.equals("function"))
+            {
+                result.add(new NonTerminalNode(TokenClass.get("FunctionDeclaration")));
+            }
+            else
+            {
+                result.add(new NonTerminalNode(TokenClass.get("Statement")));
+            }
+            result.add(new NonTerminalNode(TokenClass.get("SourceElements")));
+        }
+        else if (nodeClass == TokenClass.get("Program"))
+        {
+            result.add(new NonTerminalNode(TokenClass.get("SourceElements")));
+            result.add(new TerminalNode("<EOF>"));
+        }
+        else if (nodeClass == TokenClass.get("OptionalSemicolon"))
+        {
+            if (token.value.equals(";"))
+            {
+                result.add(new TerminalNode(";"));
+            }
+        }
+        else if (nodeClass == TokenClass.get("Statement"))
+        {
+            if (token.value.equals(";"))
+            {
+                result.add(new TerminalNode(";"));
+            }
+            else if (token.value.equals("var"))
+            {
+                result.add(new NonTerminalNode(TokenClass.get("VariableStatement")));
+                result.add(new NonTerminalNode(TokenClass.get("OptionalSemicolon")));
+            }
+            else
+            {
+                result.add(new NonTerminalNode(TokenClass.get("Expression")));
+                result.add(new NonTerminalNode(TokenClass.get("OptionalSemicolon")));
+            }
+        }
+        else if (nodeClass == TokenClass.get("VariableDeclarationList"))
+        {
+            result.add(new NonTerminalNode(TokenClass.get("VariableDeclaration")));
+            result.add(new NonTerminalNode(TokenClass.get("VariableDeclarationList_1")));
+        }
+        else if (nodeClass == TokenClass.get("VariableDeclarationList_1"))
+        {
+            if (token.value.equals(","))
+            {
+                result.add(new TerminalNode(","));
+                result.add(new NonTerminalNode(TokenClass.get("VariableDeclaration")));
+            }
+        }
+        else if (nodeClass == TokenClass.get("VariableDeclaration"))
+        {
+            result.add(new TerminalNode(TokenClass.get("Ident")));
+            result.add(new NonTerminalNode(TokenClass.get("VariableDeclaration_1")));
+        }
+        else if (nodeClass == TokenClass.get("VariableDeclaration_1"))
+        {
+            if (token.value.equals("="))
+            {
+                result.add(new TerminalNode("="));
+                result.add(new NonTerminalNode(TokenClass.get("AssignmentExpression")));
+            }
+        }
+        else if (nodeClass == TokenClass.get("VariableStatement"))
+        {
+            result.add(new TerminalNode("var"));
+            result.add(new NonTerminalNode(TokenClass.get("VariableDeclarationList")));
+        }
         else
         {
             throw new SyntaxError();
@@ -237,6 +356,6 @@ public class SyntaxTable extends AbstractSyntaxTable
     @Override
     public Node getRoot()
     {
-        return new NonTerminalNode(TokenClass.get("PrimaryExpression"));
+        return new NonTerminalNode(TokenClass.get("Program"));
     }
 }
