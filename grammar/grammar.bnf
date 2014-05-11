@@ -17,12 +17,10 @@ PropertyName	::=	Identifier
                 |	<DECIMAL_LITERAL>
 MemberExpression	::=	( ( FunctionExpression | PrimaryExpression ) ( MemberExpressionPart )* )
                     |	AllocationExpression
-MemberExpressionForIn	::=	( ( FunctionExpression | PrimaryExpression ) ( MemberExpressionPart )* )
 AllocationExpression	::=	( "new" MemberExpression ( ( Arguments ( MemberExpressionPart )* )* ) )
 MemberExpressionPart	::=	( "[" Expression "]" )
                         |	( "." Identifier )
 CallExpression	::=	MemberExpression Arguments ( CallExpressionPart )*
-CallExpressionForIn	::=	MemberExpressionForIn Arguments ( CallExpressionPart )*
 CallExpressionPart	::=	Arguments
                     |	( "[" Expression "]" )
                     |	( "." Identifier )
@@ -30,8 +28,6 @@ Arguments	::=	"(" ( ArgumentList )? ")"
 ArgumentList	::=	AssignmentExpression ( "," AssignmentExpression )*
 LeftHandSideExpression	::=	CallExpression
                         |	MemberExpression
-LeftHandSideExpressionForIn	::=	CallExpressionForIn
-                            |	MemberExpressionForIn
 PostfixExpression	::=	LeftHandSideExpression ( PostfixOperator )?
 PostfixOperator	::=	( "++" | "--" )
 UnaryExpression	::=	( PostfixExpression | ( UnaryOperator UnaryExpression )+ )
@@ -69,7 +65,6 @@ Statement	::=	Block
             |	IterationStatement
             |	ContinueStatement
             |	BreakStatement
-            |	ImportStatement
             |	ReturnStatement
             |	WithStatement
             |	SwitchStatement
@@ -89,7 +84,7 @@ IterationStatement	::=	( "do" Statement "while" "(" Expression ")" ( ";" )? )
                     |	( "for" "(" ( Expression )? ";" ( Expression )? ";" ( Expression )? ")" Statement )
                     |	( "for" "(" "var" VariableDeclarationList ";" ( Expression )? ";" ( Expression )? ")" Statement )
                     |	( "for" "(" "var" VariableDeclaration "in" Expression ")" Statement )
-                    |	( "for" "(" LeftHandSideExpressionForIn "in" Expression ")" Statement )
+                    |	( "for" "(" LeftHandSideExpression "in" Expression ")" Statement )
 ContinueStatement	::=	"continue" ( Identifier )? ( ";" )?
 BreakStatement	::=	"break" ( Identifier )? ( ";" )?
 ReturnStatement	::=	"return" ( Expression )? ( ";" )?
@@ -112,5 +107,3 @@ Program	::=	( SourceElements )? <EOF>
 SourceElements	::=	( SourceElement )+
 SourceElement	::=	FunctionDeclaration
                 |	Statement
-ImportStatement	::=	"import" Name ( "." "*" )? ";"
-Name	::=	<IDENTIFIER_NAME> ( "." <IDENTIFIER_NAME> )*

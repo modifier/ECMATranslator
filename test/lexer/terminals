@@ -19,9 +19,9 @@
 "var"
 "while"
 #PostfixOperator	        ::=	( "++" | "--" )
-UnaryOperator	        ::=	( "delete" | "void" | "typeof" | "++" | "--" | "+" | "-" | "~" | "!" )
-BinaryOperator          ::= "+" | "-" | "*" | "/" | "<" | ">"  | "==" | ">=" | "<="
-#AdditiveOperator	    ::=	"+" | "-"
+UnaryOperator	        ::=	( "delete" | "void" | "typeof" | "++" | "--" | "~" | "!" )
+BinaryOperator          ::= "*" | "/" | "<" | ">"  | "==" | ">=" | "<="
+AdditiveOperator	    ::=	"+" | "-"
 #ShiftOperator	        ::=	"<<" | ">>" | ">>>"
 #RelationalOperator      ::= "<" | ">" | "<=" | ">=" | "instanceof" | "in"
 #EqualityOperator        ::= "==" | "!=" | "===" | "!=="
