@@ -7,7 +7,7 @@ function Duck (arg1 = 15, arg2 = (function () { expression(); }))
     console.log("I like ducks");
 }
 
-var duck = 1, crack, snack = new Duck("meat", 15);
+var duck = 1, crack = 15, snack = new Duck("meat", 15);
 
 duck = 8;
 

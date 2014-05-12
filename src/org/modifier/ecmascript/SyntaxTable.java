@@ -291,28 +291,158 @@ public class SyntaxTable extends AbstractSyntaxTable
             result.add(new NonTerminalNode(TokenClass.get("SourceElements")));
             result.add(new TerminalNode("<EOF>"));
         }
-        else if (nodeClass == TokenClass.get("OptionalSemicolon"))
+        else if (nodeClass == TokenClass.get("StatementList"))
         {
-            if (token.value.equals(";"))
+            if (!token.value.equals("}"))
             {
-                result.add(new TerminalNode(";"));
+                result.add(new NonTerminalNode(TokenClass.get("Statement")));
+                result.add(new NonTerminalNode(TokenClass.get("StatementList")));
             }
+        }
+        else if (nodeClass == TokenClass.get("Block"))
+        {
+            result.add(new TerminalNode("{"));
+            result.add(new NonTerminalNode(TokenClass.get("StatementList")));
+            result.add(new TerminalNode("}"));
         }
         else if (nodeClass == TokenClass.get("Statement"))
         {
-            if (token.value.equals(";"))
+            if (token.value.equals("{"))
+            {
+                result.add(new NonTerminalNode(TokenClass.get("Block")));
+            }
+            else if (token.value.equals(";"))
             {
                 result.add(new TerminalNode(";"));
             }
             else if (token.value.equals("var"))
             {
                 result.add(new NonTerminalNode(TokenClass.get("VariableStatement")));
-                result.add(new NonTerminalNode(TokenClass.get("OptionalSemicolon")));
+                result.add(new TerminalNode(";"));
+            }
+            else if (token.value.equals("continue"))
+            {
+                result.add(new TerminalNode("continue"));
+                result.add(new TerminalNode(";"));
+            }
+            else if (token.value.equals("break"))
+            {
+                result.add(new TerminalNode("break"));
+                result.add(new TerminalNode(";"));
+            }
+            else if (token.value.equals("return"))
+            {
+                result.add(new TerminalNode("return"));
+                result.add(new NonTerminalNode(TokenClass.get("ReturnStatement")));
+                result.add(new TerminalNode(";"));
+            }
+            else if (token.value.equals("for"))
+            {
+                result.add(new NonTerminalNode(TokenClass.get("ForStatement")));
+                result.add(new TerminalNode(";"));
+            }
+            else if (token.value.equals("do"))
+            {
+                result.add(new NonTerminalNode(TokenClass.get("DoStatement")));
+                result.add(new TerminalNode(";"));
+            }
+            else if (token.value.equals("while"))
+            {
+                result.add(new NonTerminalNode(TokenClass.get("WhileStatement")));
+            }
+            else if (token.value.equals("if"))
+            {
+                result.add(new NonTerminalNode(TokenClass.get("IfStatement")));
+                result.add(new TerminalNode(";"));
+            }
+            else if (token.value.equals("switch"))
+            {
+                result.add(new NonTerminalNode(TokenClass.get("SwitchStatement")));
+            }
+            else if (token.value.equals("throw"))
+            {
+                result.add(new NonTerminalNode(TokenClass.get("ThrowStatement")));
+                result.add(new TerminalNode(";"));
+            }
+            else if (token.value.equals("try"))
+            {
+                result.add(new NonTerminalNode(TokenClass.get("TryStatement")));
             }
             else
             {
                 result.add(new NonTerminalNode(TokenClass.get("Expression")));
-                result.add(new NonTerminalNode(TokenClass.get("OptionalSemicolon")));
+                result.add(new TerminalNode(";"));
+            }
+        }
+        else if (nodeClass == TokenClass.get("ReturnStatement"))
+        {
+            if (!token.value.equals(";"))
+            {
+                result.add(new NonTerminalNode(TokenClass.get("AssignmentExpression")));
+            }
+        }
+        else if (nodeClass == TokenClass.get("ThrowStatement"))
+        {
+            result.add(new TerminalNode("throw"));
+            result.add(new NonTerminalNode(TokenClass.get("Expression")));
+        }
+        else if (nodeClass == TokenClass.get("WhileStatement"))
+        {
+            result.add(new TerminalNode("while"));
+            result.add(new TerminalNode("("));
+            result.add(new NonTerminalNode(TokenClass.get("Expression")));
+            result.add(new TerminalNode(")"));
+            result.add(new NonTerminalNode(TokenClass.get("Statement")));
+        }
+        else if (nodeClass == TokenClass.get("DoStatement"))
+        {
+            result.add(new TerminalNode("do"));
+            result.add(new NonTerminalNode(TokenClass.get("Statement")));
+            result.add(new TerminalNode("while"));
+            result.add(new TerminalNode("("));
+            result.add(new NonTerminalNode(TokenClass.get("Expression")));
+            result.add(new TerminalNode(")"));
+        }
+        else if (nodeClass == TokenClass.get("ForStatement"))
+        {
+            result.add(new TerminalNode("for"));
+            result.add(new TerminalNode("("));
+            result.add(new NonTerminalNode(TokenClass.get("ForStatement_1")));
+        }
+        else if (nodeClass == TokenClass.get("ForStatement_1"))
+        {
+            if (token.value.equals("var"))
+            {
+                result.add(new TerminalNode("var"));
+                result.add(new NonTerminalNode(TokenClass.get("VariableDeclarationList")));
+            }
+            else
+            {
+                result.add(new NonTerminalNode(TokenClass.get("Expression")));
+            }
+            result.add(new NonTerminalNode(TokenClass.get("ForStatement_2")));
+        }
+        else if (nodeClass == TokenClass.get("ForStatement_2"))
+        {
+            if (token.value.equals("in"))
+            {
+                result.add(new TerminalNode("in"));
+                result.add(new NonTerminalNode(TokenClass.get("Expression")));
+            }
+            else
+            {
+                result.add(new TerminalNode(";"));
+                result.add(new NonTerminalNode(TokenClass.get("OptionalExpression")));
+                result.add(new TerminalNode(";"));
+                result.add(new NonTerminalNode(TokenClass.get("OptionalExpression")));
+            }
+            result.add(new NonTerminalNode(TokenClass.get("Statement")));
+        }
+        else if (nodeClass == TokenClass.get("OptionalExpression"))
+        {
+            if (!token.value.equals(";"))
+            {
+                result.add(new NonTerminalNode(TokenClass.get("Expression")));
             }
         }
         else if (nodeClass == TokenClass.get("VariableDeclarationList"))
@@ -345,6 +475,87 @@ public class SyntaxTable extends AbstractSyntaxTable
         {
             result.add(new TerminalNode("var"));
             result.add(new NonTerminalNode(TokenClass.get("VariableDeclarationList")));
+        }
+        else if (nodeClass == TokenClass.get("IfStatement"))
+        {
+            result.add(new TerminalNode("if"));
+            result.add(new TerminalNode("("));
+            result.add(new NonTerminalNode(TokenClass.get("Expression")));
+            result.add(new TerminalNode(")"));
+            result.add(new NonTerminalNode(TokenClass.get("Statement")));
+            result.add(new NonTerminalNode(TokenClass.get("IfStatement_1")));
+        }
+        else if (nodeClass == TokenClass.get("IfStatement_1"))
+        {
+            if (token.value.equals("else"))
+            {
+                result.add(new TerminalNode("else"));
+                result.add(new NonTerminalNode(TokenClass.get("Statement")));
+            }
+        }
+        else if (nodeClass == TokenClass.get("SwitchStatement"))
+        {
+            result.add(new TerminalNode("switch"));
+            result.add(new TerminalNode("("));
+            result.add(new NonTerminalNode(TokenClass.get("Expression")));
+            result.add(new TerminalNode(")"));
+            result.add(new TerminalNode("{"));
+            result.add(new NonTerminalNode(TokenClass.get("CaseClause")));
+            result.add(new TerminalNode("}"));
+        }
+        else if (nodeClass == TokenClass.get("CaseClause"))
+        {
+            if (token.value.equals("case"))
+            {
+                result.add(new TerminalNode("case"));
+                result.add(new NonTerminalNode(TokenClass.get("Expression")));
+                result.add(new TerminalNode(":"));
+            }
+            else
+            {
+                result.add(new TerminalNode("default"));
+                result.add(new TerminalNode(":"));
+            }
+            result.add(new NonTerminalNode(TokenClass.get("OptionalStatementList")));
+        }
+        else if (nodeClass == TokenClass.get("OptionalStatementList"))
+        {
+            if (token.value.equals("case") || token.value.equals("default"))
+            {
+                return result;
+            }
+            result.add(new NonTerminalNode(TokenClass.get("StatementList")));
+            result.add(new NonTerminalNode(TokenClass.get("CaseClause")));
+        }
+        else if (nodeClass == TokenClass.get("TryStatement"))
+        {
+            result.add(new TerminalNode("try"));
+            result.add(new NonTerminalNode(TokenClass.get("TryStatement_1")));
+        }
+        else if (nodeClass == TokenClass.get("TryStatement_1"))
+        {
+            if (token.value.equals("catch"))
+            {
+                result.add(new TerminalNode("catch"));
+                result.add(new TerminalNode("("));
+                result.add(new TerminalNode("Ident"));
+                result.add(new TerminalNode(")"));
+                result.add(new NonTerminalNode(TokenClass.get("Block")));
+                result.add(new NonTerminalNode(TokenClass.get("TryStatement_2")));
+            }
+            else
+            {
+                result.add(new TerminalNode("finally"));
+                result.add(new NonTerminalNode(TokenClass.get("Block")));
+            }
+        }
+        else if (nodeClass == TokenClass.get("TryStatement_2"))
+        {
+            if (token.value.equals("finally"))
+            {
+                result.add(new TerminalNode("finally"));
+                result.add(new NonTerminalNode(TokenClass.get("Block")));
+            }
         }
         else
         {
