@@ -18,16 +18,8 @@
 "try"
 "var"
 "while"
-#PostfixOperator	        ::=	( "++" | "--" )
+PostfixOperator	        ::=	( "++" | "--" )
 UnaryOperator	        ::=	( "delete" | "void" | "typeof" | "++" | "--" | "~" | "!" )
-BinaryOperator          ::= "*" | "/" | "<" | ">"  | "==" | ">=" | "<="
+BinaryOperator          ::= "*" | "/" | "<" | ">" | "<=" | ">=" | "instanceof" | "in" | "<<" | ">>" | ">>>" | "==" | "!=" | "===" | "!==" | "&" | "^" | "|" | "&&" | "||"
 AdditiveOperator	    ::=	"+" | "-"
-#ShiftOperator	        ::=	"<<" | ">>" | ">>>"
-#RelationalOperator      ::= "<" | ">" | "<=" | ">=" | "instanceof" | "in"
-#EqualityOperator        ::= "==" | "!=" | "===" | "!=="
-#BitwiseANDOperator	    ::=	"&"
-#BitwiseXOROperator	    ::=	"^"
-#BitwiseOROperator	    ::=	"|"
-#LogicalANDOperator	    ::=	"&&"
-#LogicalOROperator	    ::=	"||"
-#AssignmentOperator	    ::= "=" | "*=" | "%=" | "+=" | "-=" | "<<=" | ">>=" | ">>>=" | "&=" | "^=" | "|="
+AssignmentOperator	    ::= "=" | "*=" | "%=" | "+=" | "-=" | "<<=" | ">>=" | ">>>=" | "&=" | "^=" | "|="

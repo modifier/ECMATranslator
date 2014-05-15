@@ -123,7 +123,7 @@ public class SyntaxTable extends AbstractSyntaxTable
         }
         else if (nodeClass == TokenClass.get("AssignmentExpression"))
         {
-            if (token.classId == TokenClass.get("AdditiveOperator") || token.classId == TokenClass.get("UnaryOperator"))
+            if (token.classId == TokenClass.get("AdditiveOperator") || token.classId == TokenClass.get("UnaryOperator") || token.classId == TokenClass.get("PostfixOperator"))
             {
                 result.add(new NonTerminalNode(TokenClass.get("UnaryExpression")));
             }
@@ -339,7 +339,6 @@ public class SyntaxTable extends AbstractSyntaxTable
             else if (token.value.equals("for"))
             {
                 result.add(new NonTerminalNode(TokenClass.get("ForStatement")));
-                result.add(new TerminalNode(";"));
             }
             else if (token.value.equals("do"))
             {
@@ -353,7 +352,6 @@ public class SyntaxTable extends AbstractSyntaxTable
             else if (token.value.equals("if"))
             {
                 result.add(new NonTerminalNode(TokenClass.get("IfStatement")));
-                result.add(new TerminalNode(";"));
             }
             else if (token.value.equals("switch"))
             {
@@ -408,6 +406,9 @@ public class SyntaxTable extends AbstractSyntaxTable
             result.add(new TerminalNode("for"));
             result.add(new TerminalNode("("));
             result.add(new NonTerminalNode(TokenClass.get("ForStatement_1")));
+            result.add(new NonTerminalNode(TokenClass.get("ForStatement_2")));
+            result.add(new TerminalNode(")"));
+            result.add(new NonTerminalNode(TokenClass.get("Statement")));
         }
         else if (nodeClass == TokenClass.get("ForStatement_1"))
         {
@@ -420,7 +421,6 @@ public class SyntaxTable extends AbstractSyntaxTable
             {
                 result.add(new NonTerminalNode(TokenClass.get("Expression")));
             }
-            result.add(new NonTerminalNode(TokenClass.get("ForStatement_2")));
         }
         else if (nodeClass == TokenClass.get("ForStatement_2"))
         {
@@ -436,7 +436,6 @@ public class SyntaxTable extends AbstractSyntaxTable
                 result.add(new TerminalNode(";"));
                 result.add(new NonTerminalNode(TokenClass.get("OptionalExpression")));
             }
-            result.add(new NonTerminalNode(TokenClass.get("Statement")));
         }
         else if (nodeClass == TokenClass.get("OptionalExpression"))
         {
@@ -456,6 +455,7 @@ public class SyntaxTable extends AbstractSyntaxTable
             {
                 result.add(new TerminalNode(","));
                 result.add(new NonTerminalNode(TokenClass.get("VariableDeclaration")));
+                result.add(new NonTerminalNode(TokenClass.get("VariableDeclarationList_1")));
             }
         }
         else if (nodeClass == TokenClass.get("VariableDeclaration"))

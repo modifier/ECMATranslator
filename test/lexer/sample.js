@@ -7,6 +7,19 @@ function Duck (arg1 = 15, arg2 = (function () { expression(); }))
     console.log("I like ducks");
 }
 
+var foo = function shit () {
+    console.log("I call myself from the inside!" + shit());
+
+    if (something)
+        var x = 5;
+    else
+        var z = (function () { self(); })();
+
+    for (var i in z) { }
+
+    if (true) { }
+};
+
 var duck = 1, crack = 15, snack = new Duck("meat", 15);
 
 duck = 8;

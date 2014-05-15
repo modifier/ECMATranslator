@@ -57,6 +57,11 @@ public class TerminalNode extends Node
             return token.value.equals(this.token.value);
         }
 
+        if (nodeClass == TokenClass.get("Other") && token.value.equals(this.token.value))
+        {
+            return true;
+        }
+
         return token.classId == nodeClass;
     }
 }
