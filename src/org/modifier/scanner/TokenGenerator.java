@@ -23,15 +23,7 @@ public class TokenGenerator implements Iterator<Token> {
     @Override
     public Token next()
     {
-        if (position < tokens.size())
-        {
-            return tokens.get(position++);
-        }
-        else
-        {
-            position++;
-            return new Token("<EOF>", TokenClass.get("Other"));
-        }
+        return tokens.get(position++);
     }
 
     @Override

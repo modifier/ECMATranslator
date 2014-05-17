@@ -228,7 +228,7 @@ public class Scanner implements Iterable<Token>
 
     private boolean isLiteral (char symbol)
     {
-        return '"' == symbol || '\n' == symbol;
+        return '"' == symbol || '\'' == symbol;
     }
 
     private boolean isRegex (char symbol)

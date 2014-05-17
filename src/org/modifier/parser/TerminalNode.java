@@ -27,11 +27,7 @@ public class TerminalNode extends Node
     @Override
     public String toString()
     {
-        if (null == token)
-        {
-            return nodeClass.toString();
-        }
-        return token.toString();
+        return token.value;
     }
 
     public TerminalNode(Token token)

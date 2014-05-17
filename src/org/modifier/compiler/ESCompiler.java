@@ -43,19 +43,21 @@ public class ESCompiler
         AbstractSyntaxTable table = new SyntaxTable();
         Parser parser = new Parser(lexer, table);
 
-        Node result;
+        Node result = null;
 
         try
         {
             result = parser.getTree();
 
-            printResult(result);
+            // printResult(result);
         }
         catch (SyntaxError syntaxError)
         {
             // TODO: Handle exceptions
             syntaxError.printStackTrace();
         }
+
+        System.out.print(result.toString());
     }
 
     public static HashMap<String, String> parseOpts (String[] args) throws ParseException

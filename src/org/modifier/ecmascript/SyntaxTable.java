@@ -289,7 +289,7 @@ public class SyntaxTable extends AbstractSyntaxTable
         else if (nodeClass == TokenClass.get("Program"))
         {
             result.add(new NonTerminalNode(TokenClass.get("SourceElements")));
-            result.add(new TerminalNode("<EOF>"));
+            result.add(new TerminalNode(TokenClass.get("<EOF>")));
         }
         else if (nodeClass == TokenClass.get("StatementList"))
         {
