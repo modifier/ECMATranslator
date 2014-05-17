@@ -8,16 +8,10 @@ import java.util.ArrayList;
 public class NonTerminalNode extends Node
 {
     private ArrayList<Node> children = new ArrayList<>();
-    private TokenClass tokenClass;
 
     public NonTerminalNode(TokenClass className)
     {
         tokenClass = className;
-    }
-
-    public TokenClass getTokenClass()
-    {
-        return tokenClass;
     }
 
     public void setChildren(ArrayList<Node> children)
@@ -65,7 +59,7 @@ public class NonTerminalNode extends Node
         {
             if (child instanceof TerminalNode)
             {
-                if (((TerminalNode) child).getNodeClass() == TokenClass.get("<EOF>"))
+                if (child.getNodeClass() == TokenClass.get("<EOF>"))
                 {
                     continue;
                 }

@@ -4,6 +4,7 @@ import org.modifier.ecmascript.SyntaxTable;
 import org.modifier.parser.*;
 import org.modifier.scanner.Lexer;
 import org.modifier.scanner.Scanner;
+import org.modifier.scanner.TokenClass;
 import org.modifier.utils.TerminalReader;
 
 import java.io.*;
@@ -49,7 +50,7 @@ public class ESCompiler
         {
             result = parser.getTree();
 
-            // printResult(result);
+            printResult(result);
         }
         catch (SyntaxError syntaxError)
         {
@@ -141,7 +142,16 @@ public class ESCompiler
         {
             System.out.print(isLast ? "└ " : "├ ");
         }
-        System.out.println(result.toString());
+
+        System.out.print(result.getTokenClass().toString());
+        if (result instanceof NonTerminalNode || result.getNodeClass() == TokenClass.get("<EOF>"))
+        {
+            System.out.println();
+        }
+        else
+        {
+            System.out.println(' ' + result.toString());
+        }
 
         if (result instanceof TerminalNode)
         {
