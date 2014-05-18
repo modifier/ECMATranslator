@@ -50,13 +50,17 @@ public class ESCompiler
         {
             result = parser.getTree();
 
-            printResult(result);
+//            printResult(result);
         }
         catch (SyntaxError syntaxError)
         {
             // TODO: Handle exceptions
             syntaxError.printStackTrace();
+            return;
         }
+
+        Translator translator = new Translator((NonTerminalNode)result);
+        translator.convert();
 
         System.out.print(result.toString());
     }

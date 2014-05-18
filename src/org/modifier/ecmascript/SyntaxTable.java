@@ -247,7 +247,7 @@ public class SyntaxTable extends AbstractSyntaxTable
 
             // TODO: implement default values in functions
             result.add(new TerminalNode("("));
-            result.add(new NonTerminalNode(TokenClass.get("Expression")));
+            result.add(new NonTerminalNode(TokenClass.get("VariableDeclarationList")));
             result.add(new TerminalNode(")"));
             result.add(new TerminalNode("{"));
             result.add(new NonTerminalNode(TokenClass.get("SourceElements")));
@@ -260,7 +260,7 @@ public class SyntaxTable extends AbstractSyntaxTable
 
             // TODO: implement default values in functions
             result.add(new TerminalNode("("));
-            result.add(new NonTerminalNode(TokenClass.get("Expression")));
+            result.add(new NonTerminalNode(TokenClass.get("VariableDeclarationList")));
             result.add(new TerminalNode(")"));
             result.add(new TerminalNode("{"));
             result.add(new NonTerminalNode(TokenClass.get("SourceElements")));

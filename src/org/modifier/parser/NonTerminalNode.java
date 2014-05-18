@@ -9,6 +9,11 @@ public class NonTerminalNode extends Node
 {
     private ArrayList<Node> children = new ArrayList<>();
 
+    public NonTerminalNode(String className)
+    {
+        tokenClass = TokenClass.get(className);
+    }
+
     public NonTerminalNode(TokenClass className)
     {
         tokenClass = className;
@@ -22,6 +27,29 @@ public class NonTerminalNode extends Node
     public ArrayList<Node> getChildren()
     {
         return children;
+    }
+
+    public void appendChild (Node child)
+    {
+        children.add(child);
+    }
+
+    public void clearChildren ()
+    {
+        children = new ArrayList<>();
+    }
+
+    public Node findNodeClass(String classType)
+    {
+        for (Node node : getChildren())
+        {
+            if (node.getTokenClass() == TokenClass.get(classType))
+            {
+                return node;
+            }
+        }
+
+        return null;
     }
 
     @Override
