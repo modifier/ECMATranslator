@@ -19,6 +19,12 @@ public class NonTerminalNode extends Node
         tokenClass = className;
     }
 
+    public void update(NonTerminalNode anotherNode)
+    {
+        this.children = anotherNode.children;
+        this.tokenClass = anotherNode.tokenClass;
+    }
+
     public void setChildren(ArrayList<Node> children)
     {
         this.children = children;

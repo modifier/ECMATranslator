@@ -4,6 +4,7 @@ import org.modifier.parser.Node;
 import org.modifier.parser.NonTerminalNode;
 import org.modifier.parser.TerminalNode;
 import org.modifier.scanner.TokenClass;
+import org.modifier.utils.TreeGenerator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,26 +49,14 @@ public class Translator
 
     public NonTerminalNode createIfStatement (NonTerminalNode innerExpression, NonTerminalNode body)
     {
-        NonTerminalNode block = new NonTerminalNode("Block");
-        block.appendChild(new TerminalNode("{"));
-        block.appendChild(body);
-        block.appendChild(new TerminalNode("}"));
+        TreeGenerator generator = new TreeGenerator("$Statement { IfStatement { 'if' '(' $Placeholder ')' Block { '{' $Placeholder '}' } } }");
 
-        NonTerminalNode blockStatement = new NonTerminalNode("Statement");
-        blockStatement.appendChild(block);
+        NonTerminalNode statement = generator.get(0);
+        NonTerminalNode condition = generator.get(1);
+        NonTerminalNode innerBody = generator.get(2);
 
-        NonTerminalNode expression = new NonTerminalNode("Expression");
-        expression.appendChild(innerExpression);
-
-        NonTerminalNode ifStatement = new NonTerminalNode("IfStatement");
-        ifStatement.appendChild(new TerminalNode("if"));
-        ifStatement.appendChild(new TerminalNode("("));
-        ifStatement.appendChild(expression);
-        ifStatement.appendChild(new TerminalNode(")"));
-        ifStatement.appendChild(block);
-
-        NonTerminalNode statement = new NonTerminalNode("Statement");
-        statement.appendChild(ifStatement);
+        condition.update(innerExpression);
+        innerBody.update(body);
 
         return statement;
     }
