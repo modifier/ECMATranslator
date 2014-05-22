@@ -3,6 +3,7 @@ package org.modifier.compiler;
 import org.modifier.parser.Node;
 import org.modifier.parser.NonTerminalNode;
 import org.modifier.parser.TerminalNode;
+import org.modifier.scanner.Token;
 import org.modifier.scanner.TokenClass;
 import org.modifier.utils.TreeGenerator;
 
@@ -44,6 +45,10 @@ public class Translator
         )
         {
             convertFunction(node);
+        }
+        else if (node.getNodeClass() == TokenClass.get("ForStatement"))
+        {
+            convertForLoop(node);
         }
     }
 
@@ -117,6 +122,7 @@ public class Translator
         // And put them into the body
         for (TerminalNode key : assignees.keySet())
         {
+            // TODO: Refactor using TreeGenerator
             // Create condition
             NonTerminalNode leftConditionPart = new NonTerminalNode("BinaryExpression");
             leftConditionPart.appendChild(new TerminalNode("=="));
@@ -152,5 +158,56 @@ public class Translator
 
         body.clearChildren();
         body.appendChild(lastSource.getChildren().get(0));
+    }
+
+    public void convertForLoop(NonTerminalNode node)
+    {
+        NonTerminalNode expressionLeft = (NonTerminalNode)node.findNodeClass("ForStatement_1");
+        NonTerminalNode expressionRight = (NonTerminalNode)node.findNodeClass("ForStatement_2");
+        NonTerminalNode body = (NonTerminalNode)node.findNodeClass("Statement");
+
+        TerminalNode operatorName = (TerminalNode)(expressionRight.getChildren().get(0));
+
+        if (!operatorName.getToken().value.equals("of"))
+        {
+            return;
+        }
+
+        // TODO: unhardcode variable's name
+        String keyName = "__key__";
+        String collectionName = "__collection__";
+
+        // Find out value's variable name and fetch collection expression
+        TerminalNode nameToken = (TerminalNode)expressionLeft.findDeep("Ident");
+        String name = nameToken.getToken().value;
+
+        NonTerminalNode collectionExpression = (NonTerminalNode)expressionRight.getChildren().get(1);
+
+        // Replace all this stuff with new ones
+        nameToken.setToken(new Token(keyName, TokenClass.get("Ident")));
+
+        expressionRight.clearChildren();
+        expressionRight.appendChild(new TerminalNode(new Token("in")));
+        expressionRight.appendChild(new TerminalNode(new Token(collectionName, TokenClass.get("Ident"))));
+
+        // Append calculation to the loop body
+        TreeGenerator innerBlock = new TreeGenerator("$Block { '{' StatementList { $Statement StatementList { $Statement } } '}' }");
+        TreeGenerator outerAssigment = new TreeGenerator("$Statement { 'var' VariableDeclarationList { VariableDeclaration { (Ident," + name + ") VariableDeclaration_1 { '=' '(' $AssignmentExpression ')' } } } ';' }");
+        TreeGenerator innerAssignment = new TreeGenerator("$AssignmentExpression { LeftHandSideExpression { MemberExpression { PrimaryExpression { (Ident,__collection__) } } MemberExpressionPart { '[' (Ident,__key__) ']' } } }");
+
+        outerAssigment.get(1).update(innerAssignment.get(0));
+        innerBlock.get(1).update(outerAssigment.get(0));
+        innerBlock.get(2).update(body.clone());
+        body.clearChildren();
+        body.appendChild(innerBlock.get(0));
+
+        // At last, we wrap initial loop into block
+        TreeGenerator wrapper = new TreeGenerator("$Block { '{' StatementList { $Statement StatementList { $Statement } } '}' }");
+        TreeGenerator preCalculation = new TreeGenerator("$Statement { 'var' VariableDeclarationList { VariableDeclaration { (Ident," +  collectionName + ") VariableDeclaration_1 { '=' '(' $AssignmentExpression ')' } } } ';' }");
+
+        wrapper.get(2).update(node.clone());
+        node.update(wrapper.get(0));
+        wrapper.get(1).update(preCalculation.get(0));
+        preCalculation.get(1).update(collectionExpression);
     }
 }

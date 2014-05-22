@@ -420,7 +420,12 @@ public class SyntaxTable extends AbstractSyntaxTable
         }
         else if (nodeClass == TokenClass.get("ForStatement_2"))
         {
-            if (token.value.equals("in"))
+            if (token.value.equals("of"))
+            {
+                result.add(new TerminalNode("of"));
+                result.add(new NonTerminalNode(TokenClass.get("Expression")));
+            }
+            else if (token.value.equals("in"))
             {
                 result.add(new TerminalNode("in"));
                 result.add(new NonTerminalNode(TokenClass.get("Expression")));

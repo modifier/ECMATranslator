@@ -3,6 +3,8 @@ package org.modifier.utils;
 import org.modifier.parser.Node;
 import org.modifier.parser.NonTerminalNode;
 import org.modifier.parser.TerminalNode;
+import org.modifier.scanner.Token;
+import org.modifier.scanner.TokenClass;
 
 import java.util.ArrayList;
 
@@ -45,6 +47,10 @@ public class TreeGenerator
             {
                 position++;
                 generate(lastNT);
+            }
+            else if ('(' == tree.charAt(position))
+            {
+                container.appendChild(new TerminalNode(matchToken()));
             }
             else if ('\'' == tree.charAt(position))
             {
@@ -95,5 +101,23 @@ public class TreeGenerator
             b.append(tree.charAt(position++));
         }
         return b.toString();
+    }
+
+    private Token matchToken ()
+    {
+        String value, type = null;
+        StringBuilder b = new StringBuilder();
+        while (')' != tree.charAt(++position))
+        {
+            if (',' == tree.charAt(position))
+            {
+                type = b.toString();
+                b = new StringBuilder();
+                continue;
+            }
+            b.append(tree.charAt(position));
+        }
+        value = b.toString();
+        return new Token(value, TokenClass.get(type));
     }
 }

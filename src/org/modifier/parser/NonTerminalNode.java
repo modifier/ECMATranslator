@@ -25,6 +25,13 @@ public class NonTerminalNode extends Node
         this.tokenClass = anotherNode.tokenClass;
     }
 
+    public NonTerminalNode clone ()
+    {
+        NonTerminalNode clone = new NonTerminalNode(tokenClass);
+        clone.children = children;
+        return clone;
+    }
+
     public void setChildren(ArrayList<Node> children)
     {
         this.children = children;
@@ -52,6 +59,28 @@ public class NonTerminalNode extends Node
             if (node.getTokenClass() == TokenClass.get(classType))
             {
                 return node;
+            }
+        }
+
+        return null;
+    }
+
+    public Node findDeep(String classType)
+    {
+        for (Node node : getChildren())
+        {
+            if (node.getTokenClass() == TokenClass.get(classType))
+            {
+                return node;
+            }
+
+            if (node instanceof NonTerminalNode)
+            {
+                Node result = ((NonTerminalNode) node).findDeep(classType);
+                if (result != null)
+                {
+                    return result;
+                }
             }
         }
 

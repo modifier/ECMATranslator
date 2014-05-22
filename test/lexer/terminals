@@ -18,6 +18,7 @@
 "try"
 "var"
 "while"
+"of"
 PostfixOperator	        ::=	( "++" | "--" )
 UnaryOperator	        ::=	( "delete" | "void" | "typeof" | "++" | "--" | "~" | "!" )
 BinaryOperator          ::= "*" | "/" | "<" | ">" | "<=" | ">=" | "instanceof" | "in" | "<<" | ">>" | ">>>" | "==" | "!=" | "===" | "!==" | "&" | "^" | "|" | "&&" | "||"
