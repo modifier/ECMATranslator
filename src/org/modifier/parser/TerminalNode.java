@@ -13,6 +13,12 @@ public class TerminalNode extends Node
         token = new Token(value);
     }
 
+    public TerminalNode(String value, String classId)
+    {
+        this.tokenClass = TokenClass.get(classId);
+        token = new Token(value, classId);
+    }
+
     public TerminalNode(TokenClass nodeClass)
     {
         this.tokenClass = nodeClass;

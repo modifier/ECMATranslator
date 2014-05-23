@@ -15,6 +15,11 @@ public class Token {
         this.classId = classId;
     }
 
+    public Token (String value, String classId) {
+        this.value = value;
+        this.classId = TokenClass.get(classId);
+    }
+
     @Override
     public String toString() {
         return classId.toString() + " " + value;

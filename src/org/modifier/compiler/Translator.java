@@ -6,6 +6,7 @@ import org.modifier.parser.TerminalNode;
 import org.modifier.scanner.Token;
 import org.modifier.scanner.TokenClass;
 import org.modifier.utils.TreeGenerator;
+import org.modifier.utils.Template;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,34 +51,6 @@ public class Translator
         {
             convertForLoop(node);
         }
-    }
-
-    public NonTerminalNode createIfStatement (NonTerminalNode innerExpression, NonTerminalNode body)
-    {
-        TreeGenerator generator = new TreeGenerator("$Statement { IfStatement { 'if' '(' $Placeholder ')' Block { '{' $Placeholder '}' } } }");
-
-        NonTerminalNode statement = generator.get(0);
-        NonTerminalNode condition = generator.get(1);
-        NonTerminalNode innerBody = generator.get(2);
-
-        condition.update(innerExpression);
-        innerBody.update(body);
-
-        return statement;
-    }
-
-    public NonTerminalNode createVariable (Node name)
-    {
-        NonTerminalNode primary = new NonTerminalNode("PrimaryExpression");
-        primary.appendChild(name);
-        NonTerminalNode member = new NonTerminalNode("MemberExpression");
-        member.appendChild(primary);
-        NonTerminalNode leftHand = new NonTerminalNode("LeftHandSideExpression");
-        leftHand.appendChild(member);
-        NonTerminalNode assignment = new NonTerminalNode("AssignmentExpression");
-        assignment.appendChild(leftHand);
-
-        return assignment;
     }
 
     public void convertFunction (NonTerminalNode node)
@@ -126,16 +99,16 @@ public class Translator
             // Create condition
             NonTerminalNode leftConditionPart = new NonTerminalNode("BinaryExpression");
             leftConditionPart.appendChild(new TerminalNode("=="));
-            leftConditionPart.appendChild((createVariable(new TerminalNode("null"))));
+            leftConditionPart.appendChild((Template.expression(new TerminalNode("null")).get(0)));
 
-            NonTerminalNode condition = createVariable(key);
+            NonTerminalNode condition = Template.expression(key).get(0);
             condition.appendChild(leftConditionPart);
 
             // And then body
             NonTerminalNode leftAssignmentPart = new NonTerminalNode("BinaryExpression");
             leftAssignmentPart.appendChild(new TerminalNode("="));
             leftAssignmentPart.appendChild(assignees.get(key));
-            NonTerminalNode assignment = createVariable(key);
+            NonTerminalNode assignment = Template.expression(key).get(0);
             assignment.appendChild(leftAssignmentPart);
             assignment.appendChild(new TerminalNode(";"));
             NonTerminalNode innerExpression = new NonTerminalNode("Expression");
@@ -145,7 +118,7 @@ public class Translator
             NonTerminalNode slist = new NonTerminalNode("StatementList");
             slist.appendChild(statement);
 
-            NonTerminalNode result = createIfStatement(condition, slist);
+            NonTerminalNode result = Template.ifStatement(condition, slist).get(0);
             NonTerminalNode sourceElement = new NonTerminalNode("SourceElement");
             sourceElement.appendChild(result);
             sourceElement.appendChild(lastSource);
@@ -191,9 +164,9 @@ public class Translator
         expressionRight.appendChild(new TerminalNode(new Token(collectionName, TokenClass.get("Ident"))));
 
         // Append calculation to the loop body
-        TreeGenerator innerBlock = new TreeGenerator("$Block { '{' StatementList { $Statement StatementList { $Statement } } '}' }");
-        TreeGenerator outerAssigment = new TreeGenerator("$Statement { 'var' VariableDeclarationList { VariableDeclaration { (Ident," + name + ") VariableDeclaration_1 { '=' '(' $AssignmentExpression ')' } } } ';' }");
-        TreeGenerator innerAssignment = new TreeGenerator("$AssignmentExpression { LeftHandSideExpression { MemberExpression { PrimaryExpression { (Ident,__collection__) } } MemberExpressionPart { '[' (Ident,__key__) ']' } } }");
+        TreeGenerator innerBlock = Template.block(2);
+        TreeGenerator outerAssigment = Template.declaration(name);
+        TreeGenerator innerAssignment = Template.accessor(new TerminalNode("__collection__", "Ident"), Template.expression(new TerminalNode("__key__", "Ident")).get(0));
 
         outerAssigment.get(1).update(innerAssignment.get(0));
         innerBlock.get(1).update(outerAssigment.get(0));
@@ -202,12 +175,13 @@ public class Translator
         body.appendChild(innerBlock.get(0));
 
         // At last, we wrap initial loop into block
-        TreeGenerator wrapper = new TreeGenerator("$Block { '{' StatementList { $Statement StatementList { $Statement } } '}' }");
-        TreeGenerator preCalculation = new TreeGenerator("$Statement { 'var' VariableDeclarationList { VariableDeclaration { (Ident," +  collectionName + ") VariableDeclaration_1 { '=' '(' $AssignmentExpression ')' } } } ';' }");
+        TreeGenerator wrapper = Template.block(2);
+        TreeGenerator preCalculation = Template.declaration(collectionName);
+        TreeGenerator accessor = Template.accessor(new TerminalNode(collectionName, "Ident"), collectionExpression);
 
+        preCalculation.get(1).update(collectionExpression);
         wrapper.get(2).update(node.clone());
         node.update(wrapper.get(0));
         wrapper.get(1).update(preCalculation.get(0));
-        preCalculation.get(1).update(collectionExpression);
     }
 }
