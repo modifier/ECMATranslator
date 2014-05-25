@@ -28,4 +28,9 @@ public class Scope
         }
         return hasHere;
     }
+
+    public void setParent (Scope parent)
+    {
+        parentScope = parent;
+    }
 }

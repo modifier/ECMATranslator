@@ -59,6 +59,9 @@ public class ESCompiler
             return;
         }
 
+        Scoper scoper = new Scoper((NonTerminalNode)result);
+        scoper.process();
+
         Translator translator = new Translator((NonTerminalNode)result);
         translator.convert();
 

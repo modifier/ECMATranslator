@@ -245,7 +245,7 @@ public class SyntaxTable extends AbstractSyntaxTable
                 result.add(new TerminalNode(TokenClass.get("Ident")));
             }
             result.add(new TerminalNode("("));
-            result.add(new NonTerminalNode(TokenClass.get("VariableDeclarationList")));
+            result.add(new NonTerminalNode(TokenClass.get("FunctionDeclaration_1")));
             result.add(new TerminalNode(")"));
             result.add(new TerminalNode("{"));
             result.add(new NonTerminalNode(TokenClass.get("SourceElements")));
@@ -256,11 +256,18 @@ public class SyntaxTable extends AbstractSyntaxTable
             result.add(new TerminalNode("function"));
             result.add(new TerminalNode(TokenClass.get("Ident")));
             result.add(new TerminalNode("("));
-            result.add(new NonTerminalNode(TokenClass.get("VariableDeclarationList")));
+            result.add(new NonTerminalNode(TokenClass.get("FunctionDeclaration_1")));
             result.add(new TerminalNode(")"));
             result.add(new TerminalNode("{"));
             result.add(new NonTerminalNode(TokenClass.get("SourceElements")));
             result.add(new TerminalNode("}"));
+        }
+        else if (nodeClass == TokenClass.get("FunctionDeclaration_1"))
+        {
+            if (!token.value.equals(")"))
+            {
+                result.add(new NonTerminalNode(TokenClass.get("VariableDeclarationList")));
+            }
         }
         else if (nodeClass == TokenClass.get("SourceElements"))
         {
@@ -474,7 +481,7 @@ public class SyntaxTable extends AbstractSyntaxTable
         }
         else if (nodeClass == TokenClass.get("VariableStatement"))
         {
-            result.add(new TerminalNode("Declarator"));
+            result.add(new TerminalNode(TokenClass.get("Declarator")));
             result.add(new NonTerminalNode(TokenClass.get("VariableDeclarationList")));
         }
         else if (nodeClass == TokenClass.get("IfStatement"))

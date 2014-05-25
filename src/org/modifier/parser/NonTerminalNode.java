@@ -1,5 +1,6 @@
 package org.modifier.parser;
 
+import org.modifier.compiler.Scope;
 import org.modifier.scanner.TokenClass;
 import org.modifier.utils.Tuple;
 
@@ -8,6 +9,7 @@ import java.util.ArrayList;
 public class NonTerminalNode extends Node
 {
     private ArrayList<Node> children = new ArrayList<>();
+    public Scope scope = new Scope();
 
     public NonTerminalNode(String className)
     {
