@@ -56,8 +56,15 @@ public class Translator
     public void convertFunction (NonTerminalNode node)
     {
         // Find necessary kids first
-        NonTerminalNode expression = (NonTerminalNode)node.findNodeClass("VariableDeclarationList");
+        NonTerminalNode functionDeclaration = (NonTerminalNode)node.findNodeClass("FunctionDeclaration_1");
         NonTerminalNode body = (NonTerminalNode)node.findNodeClass("SourceElements");
+
+        NonTerminalNode expression = (NonTerminalNode)functionDeclaration.findNodeClass("VariableDeclarationList");
+
+        if (expression == null)
+        {
+            return;
+        }
 
         // Now find assigned arguments
         ArrayList<NonTerminalNode> declarations = new ArrayList<>();
