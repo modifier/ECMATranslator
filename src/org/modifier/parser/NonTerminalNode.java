@@ -87,6 +87,24 @@ public class NonTerminalNode extends Node
         return null;
     }
 
+    public Node closest(ArrayList<String> list)
+    {
+        if (parent == null)
+        {
+            return null;
+        }
+
+        for (String type : list)
+        {
+            if (parent.getNodeClass() == TokenClass.get(type))
+            {
+                return parent;
+            }
+        }
+
+        return parent.closest(list);
+    }
+
     @Override
     public String toString()
     {

@@ -27,6 +27,10 @@ public class Parser
             while (currentRule instanceof NonTerminalNode)
             {
                 ArrayList<Node> rule = table.getRule(currentToken, currentRule);
+                for (Node subrule : rule)
+                {
+                    subrule.setParent((NonTerminalNode)currentRule);
+                }
                 ((NonTerminalNode) currentRule).setChildren(rule);
                 linearTree.remove(pointer);
                 linearTree.addAll(pointer, rule);
