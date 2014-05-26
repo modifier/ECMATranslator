@@ -19,13 +19,13 @@ public class Translator
         root = node;
     }
 
-    public NonTerminalNode convert () throws VariableException
+    public NonTerminalNode convert () throws TypeError
     {
         explore(root);
         return root;
     }
 
-    public void explore (NonTerminalNode root) throws VariableException
+    public void explore (NonTerminalNode root) throws TypeError
     {
         check(root);
 
@@ -38,7 +38,7 @@ public class Translator
         }
     }
 
-    public void check (NonTerminalNode node) throws VariableException
+    public void check (NonTerminalNode node) throws TypeError
     {
         if (
             node.getNodeClass() == TokenClass.get("FunctionExpression_1")
@@ -64,7 +64,7 @@ public class Translator
         }
     }
 
-    private void checkConstInstruction (NonTerminalNode node) throws VariableException
+    private void checkConstInstruction (NonTerminalNode node) throws TypeError
     {
         NonTerminalNode rightSide = (NonTerminalNode)node.findNodeClass("BinaryExpression");
         boolean hasAssignment = rightSide.findNodeClass("AssignmentOperator") != null;
@@ -91,7 +91,7 @@ public class Translator
         String ident = ((TerminalNode)subKid).getToken().value;
         if (closestScope.hasConstIdent(ident))
         {
-            throw new VariableException(ident);
+            throw TypeError.constantCannotBeRedefined(ident);
         }
     }
 

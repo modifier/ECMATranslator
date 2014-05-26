@@ -64,7 +64,7 @@ public class ESCompiler
         {
             scoper.process();
         }
-        catch (VariableException ex)
+        catch (TypeError ex)
         {
             System.out.print(ex.getMessage());
             return;
@@ -75,7 +75,7 @@ public class ESCompiler
         {
             translator.convert();
         }
-        catch (VariableException ex)
+        catch (TypeError ex)
         {
             System.out.print(ex.getMessage());
             return;

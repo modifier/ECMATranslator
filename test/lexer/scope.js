@@ -1,5 +1,6 @@
 function dno () {
     const zg = 15;
+    const zg = 115;
     var i = 5;
     {
         var d = 7;

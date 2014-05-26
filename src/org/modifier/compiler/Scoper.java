@@ -5,7 +5,6 @@ import org.modifier.parser.NonTerminalNode;
 import org.modifier.parser.TerminalNode;
 import org.modifier.scanner.TokenClass;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Scoper
@@ -17,13 +16,13 @@ public class Scoper
         this.root = root;
     }
 
-    public NonTerminalNode process () throws VariableException
+    public NonTerminalNode process () throws TypeError
     {
         explore(root);
         return root;
     }
 
-    public void explore (NonTerminalNode root) throws VariableException
+    public void explore (NonTerminalNode root) throws TypeError
     {
         check(root);
 
@@ -36,7 +35,7 @@ public class Scoper
         }
     }
 
-    private void check (NonTerminalNode node) throws VariableException
+    private void check (NonTerminalNode node) throws TypeError
     {
         HashMap<String, Node> valueMap = new HashMap<>();
         String name = null;

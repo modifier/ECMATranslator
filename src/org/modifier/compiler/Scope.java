@@ -18,20 +18,20 @@ public class Scope
         parentScope = parent;
     }
 
-    public void addIdent (String ident) throws VariableException
+    public void addIdent (String ident) throws TypeError
     {
         if (hasConstIdent(ident))
         {
-            throw new VariableException(ident);
+            throw TypeError.constantIsAlreadyDefined(ident);
         }
         vars.add(ident);
     }
 
-    public void addConst (String ident, Node value) throws VariableException
+    public void addConst (String ident, Node value) throws TypeError
     {
         if (hasOwnIdent(ident))
         {
-            throw new VariableException(ident);
+            throw TypeError.constantIsAlreadyDefined(ident);
         }
         consts.put(ident, value);
     }
