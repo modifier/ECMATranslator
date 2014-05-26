@@ -18,25 +18,24 @@ public class Scoper
 
     public NonTerminalNode process ()
     {
-        explore(root, null);
+        explore(root);
         return root;
     }
 
-    public void explore (NonTerminalNode root, Scope parentScope)
+    public void explore (NonTerminalNode root)
     {
-        Scope newScope = check(root, parentScope);
-        Scope currentScope = newScope != null ? newScope : parentScope;
+        check(root);
 
         for (Node node : root.getChildren())
         {
             if (node instanceof NonTerminalNode)
             {
-                explore((NonTerminalNode)node, currentScope);
+                explore((NonTerminalNode)node);
             }
         }
     }
 
-    private Scope check (NonTerminalNode node, Scope parentScope)
+    private void check (NonTerminalNode node)
     {
         ArrayList<String> names = new ArrayList<>();
         boolean isVarScope = true;
@@ -49,7 +48,7 @@ public class Scoper
             Node first = node.getChildren().get(0);
             if (first.getNodeClass() != TokenClass.get("Ident"))
             {
-                return null;
+                return;
             }
             names.add(((TerminalNode)first).getToken().value);
         }
@@ -58,7 +57,7 @@ public class Scoper
             Node first = node.getChildren().get(0);
             if (first.getNodeClass() != TokenClass.get("Declarator"))
             {
-                return null;
+                return;
             }
             isVarScope = ((TerminalNode)first).getToken().value.equals("var");
 
@@ -72,7 +71,7 @@ public class Scoper
         }
         else
         {
-            return null;
+            return;
         }
 
         NonTerminalNode scope = isVarScope ? node.closestVarBlock() : node.closestLetBlock();
@@ -80,7 +79,5 @@ public class Scoper
         {
             scope.getScope().addIdent(ident);
         }
-
-        return scope.getScope();
     }
 }
