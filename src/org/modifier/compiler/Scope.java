@@ -21,12 +21,23 @@ public class Scope
 
     public boolean hasIdent (String ident)
     {
-        boolean hasHere = vars.indexOf(ident) != -1;
+        boolean hasHere = hasOwnIdent(ident);
         if (!hasHere && parentScope != null)
         {
             return parentScope.hasIdent(ident);
         }
         return hasHere;
+    }
+
+    public boolean hasOwnIdent (String ident)
+    {
+        return vars.indexOf(ident) != -1;
+    }
+
+    public void replace (String oldIdent, String newIdent)
+    {
+        vars.remove(oldIdent);
+        vars.add(newIdent);
     }
 
     public void setParent (Scope parent)

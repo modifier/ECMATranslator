@@ -49,11 +49,116 @@ public class Translator
         }
         else if (node.getNodeClass() == TokenClass.get("ForStatement"))
         {
-            convertForLoop(node);
+            convertForOf(node);
+        }
+        else if (
+            node.getNodeClass() == TokenClass.get("VariableStatement")
+            || node.getNodeClass() == TokenClass.get("ForStatement_1")
+        )
+        {
+            convertLetInstruction(node);
         }
     }
 
-    public void convertFunction (NonTerminalNode node)
+    private void convertLetInstruction (NonTerminalNode node)
+    {
+        Node first = node.getChildren().get(0);
+        if (
+            first.getNodeClass() != TokenClass.get("Declarator")
+            || !((TerminalNode)first).getToken().value.equals("let")
+        )
+        {
+            return;
+        }
+
+        ((TerminalNode)first).setToken(new Token("var"));
+
+        NonTerminalNode letBlock = node.closestLetBlock();
+
+        if (letBlock.isVarBlock())
+        {
+            return;
+        }
+
+        HashMap<String, String> renamed = new HashMap<>();
+
+        NonTerminalNode list = (NonTerminalNode)node.findNodeClass("VariableDeclarationList");
+        while (list.getChildren().size() != 0)
+        {
+            NonTerminalNode declaration = (NonTerminalNode)list.findNodeClass("VariableDeclaration");
+            TerminalNode ident = (TerminalNode)declaration.findNodeClass("Ident");
+
+            String identValue = ident.getToken().value;
+            String newValue;
+            int i = 0;
+            do
+            {
+                newValue = identValue + "_" + (++i);
+            } while (letBlock.getScope().hasIdent(newValue));
+            renamed.put(identValue, newValue);
+
+            ident.setToken(new Token(newValue, "Ident"));
+            letBlock.getScope().replace(identValue, newValue);
+
+            list = (NonTerminalNode)list.findNodeClass("VariableDeclarationList_1");
+        }
+
+        exploreLet(letBlock, renamed);
+    }
+
+    private void exploreLet (NonTerminalNode root, HashMap<String, String> renamed)
+    {
+        for (Node kid : root.getChildren())
+        {
+            if (kid.getNodeClass() == TokenClass.get("Ident"))
+            {
+                TerminalNode tekid = (TerminalNode)kid;
+                for (String initial : renamed.keySet())
+                {
+                    if (tekid.getToken().value.equals(initial))
+                    {
+                        tekid.setToken(new Token(renamed.get(initial), "Ident"));
+                        break;
+                    }
+                }
+                continue;
+            }
+
+            if (kid instanceof TerminalNode)
+            {
+                continue;
+            }
+
+            NonTerminalNode nokid = (NonTerminalNode)kid;
+
+            HashMap<String, String> rebuilt = renamed;
+            if (nokid.getScope() != null)
+            {
+                rebuilt = new HashMap<>();
+                for (String initial : renamed.keySet())
+                {
+                    if (!nokid.getScope().hasOwnIdent(initial))
+                    {
+                        rebuilt.put(initial, renamed.get(initial));
+                    }
+                }
+            }
+
+            if (rebuilt.size() == renamed.size())
+            {
+                rebuilt = renamed;
+            }
+
+            if (rebuilt.size() == 0)
+            {
+                continue;
+            }
+
+            exploreLet(nokid, rebuilt);
+        }
+    }
+
+    private void convertFunction (NonTerminalNode node)
     {
         // Find necessary kids first
         NonTerminalNode functionDeclaration = (NonTerminalNode)node.findNodeClass("FunctionDeclaration_1");
@@ -140,7 +245,7 @@ public class Translator
         body.appendChild(lastSource.getChildren().get(0));
     }
 
-    public void convertForLoop(NonTerminalNode node)
+    private void convertForOf(NonTerminalNode node)
     {
         NonTerminalNode expressionLeft = (NonTerminalNode)node.findNodeClass("ForStatement_1");
         NonTerminalNode expressionRight = (NonTerminalNode)node.findNodeClass("ForStatement_2");

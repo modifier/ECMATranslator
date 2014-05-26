@@ -1,6 +1,7 @@
 package org.modifier.parser;
 
 import org.modifier.compiler.Scope;
+import org.modifier.scanner.Token;
 import org.modifier.scanner.TokenClass;
 import org.modifier.utils.Tuple;
 
@@ -9,7 +10,7 @@ import java.util.ArrayList;
 public class NonTerminalNode extends Node
 {
     private ArrayList<Node> children = new ArrayList<>();
-    public Scope scope = new Scope();
+    private Scope scope;
 
     public NonTerminalNode(String className)
     {
@@ -19,6 +20,25 @@ public class NonTerminalNode extends Node
     public NonTerminalNode(TokenClass className)
     {
         tokenClass = className;
+    }
+
+    public Scope getScope()
+    {
+        if (!isLetBlock())
+        {
+            return null;
+        }
+
+        if (scope == null)
+        {
+            scope = new Scope();
+            NonTerminalNode letBlock = closestLetBlock();
+            if (letBlock != null)
+            {
+                scope.setParent(letBlock.getScope());
+            }
+        }
+        return scope;
     }
 
     public void update(NonTerminalNode anotherNode)
@@ -89,6 +109,40 @@ public class NonTerminalNode extends Node
         return null;
     }
 
+    public NonTerminalNode closestLetBlock()
+    {
+        ArrayList<String> letScope = new ArrayList<>();
+        letScope.add("Block");
+        letScope.add("ForStatement");
+        letScope.add("FunctionDeclaration");
+        letScope.add("FunctionExpression");
+        letScope.add("Program");
+        return (NonTerminalNode)closest(letScope);
+    }
+
+    public boolean isLetBlock()
+    {
+        return tokenClass == TokenClass.get("Block")
+            || tokenClass == TokenClass.get("ForStatement")
+            || isVarBlock();
+    }
+
+    public boolean isVarBlock()
+    {
+        return tokenClass == TokenClass.get("FunctionDeclaration")
+            || tokenClass == TokenClass.get("FunctionExpression")
+            || tokenClass == TokenClass.get("Program");
+    }
+
+    public NonTerminalNode closestVarBlock()
+    {
+        ArrayList<String> varScope = new ArrayList<>();
+        varScope.add("FunctionDeclaration");
+        varScope.add("FunctionExpression");
+        varScope.add("Program");
+        return (NonTerminalNode)closest(varScope);
+    }
+
     public Node closest(ArrayList<String> list)
     {
         if (parent == null)
@@ -124,7 +178,7 @@ public class NonTerminalNode extends Node
         for (int i = 0; i < str.length(); i++)
         {
             char c = str.charAt(i);
-            if (c == '$' || c == '_' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z')
+            if (c == '$' || c == '_' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z' || c >= '0' && c <= '9')
             {
                 continue;
             }

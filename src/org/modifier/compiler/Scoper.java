@@ -40,12 +40,6 @@ public class Scoper
     {
         ArrayList<String> names = new ArrayList<>();
         boolean isVarScope = true;
-        ArrayList<String> varScope = new ArrayList<>(), letScope = new ArrayList<>();
-        varScope.add("FunctionDeclaration");
-        varScope.add("FunctionExpression");
-        varScope.add("Program");
-        letScope.add("Block");
-        letScope.add("ForStatement");
         if (node.getNodeClass() == TokenClass.get("FunctionDeclaration"))
         {
             names.add(((TerminalNode)(node).findNodeClass("Ident")).getToken().value);
@@ -81,13 +75,12 @@ public class Scoper
             return null;
         }
 
-        NonTerminalNode scope = (NonTerminalNode)node.closest(isVarScope ? varScope : letScope);
-        scope.scope.setParent(parentScope);
+        NonTerminalNode scope = isVarScope ? node.closestVarBlock() : node.closestLetBlock();
         for (String ident : names)
         {
-            scope.scope.addIdent(ident);
+            scope.getScope().addIdent(ident);
         }
 
-        return scope.scope;
+        return scope.getScope();
     }
 }

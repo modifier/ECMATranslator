@@ -7,6 +7,13 @@ function dno () {
         {
             function unusual ()
             {
+                k = 15;
+                z = 115;
+                {
+                    let z = 16;
+                    z = 224;
+                    k = 25;
+                }
                 var override, test;
             };
         }
