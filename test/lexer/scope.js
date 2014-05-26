@@ -1,4 +1,5 @@
 function dno () {
+    const zg = 15;
     var i = 5;
     {
         var d = 7;
@@ -7,6 +8,7 @@ function dno () {
         {
             function unusual ()
             {
+                const zg = "one more time";
                 k = 15;
                 z = 115;
                 {

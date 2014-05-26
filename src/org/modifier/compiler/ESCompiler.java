@@ -60,7 +60,15 @@ public class ESCompiler
         }
 
         Scoper scoper = new Scoper((NonTerminalNode)result);
-        scoper.process();
+        try
+        {
+            scoper.process();
+        }
+        catch (VariableException ex)
+        {
+            System.out.print(ex.getMessage());
+            return;
+        }
 
         Translator translator = new Translator((NonTerminalNode)result);
         translator.convert();

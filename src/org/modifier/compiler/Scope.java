@@ -1,10 +1,14 @@
 package org.modifier.compiler;
 
+import org.modifier.parser.Node;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Scope
 {
     private ArrayList<String> vars = new ArrayList<>();
+    private HashMap<String, Node> consts = new HashMap<>();
     private Scope parentScope = null;
 
     public Scope () { }
@@ -14,9 +18,22 @@ public class Scope
         parentScope = parent;
     }
 
-    public void addIdent (String ident)
+    public void addIdent (String ident) throws VariableException
     {
+        if (consts.containsKey(ident))
+        {
+            throw new VariableException(ident);
+        }
         vars.add(ident);
+    }
+
+    public void addConst (String ident, Node value) throws VariableException
+    {
+        if (hasOwnIdent(ident))
+        {
+            throw new VariableException(ident);
+        }
+        consts.put(ident, value);
     }
 
     public boolean hasIdent (String ident)
@@ -31,7 +48,7 @@ public class Scope
 
     public boolean hasOwnIdent (String ident)
     {
-        return vars.indexOf(ident) != -1;
+        return vars.indexOf(ident) != -1 || consts.containsKey(ident);
     }
 
     public void replace (String oldIdent, String newIdent)
