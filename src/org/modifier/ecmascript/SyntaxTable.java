@@ -149,7 +149,7 @@ public class SyntaxTable extends AbstractSyntaxTable
             }
             else if (token.value.equals("="))
             {
-                result.add(new TerminalNode("="));
+                result.add(new TerminalNode("=", "AssignmentOperator"));
                 result.add(new NonTerminalNode(TokenClass.get("UnaryExpression")));
                 result.add(new NonTerminalNode(TokenClass.get("BinaryExpression")));
             }

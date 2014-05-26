@@ -20,7 +20,7 @@ public class Scope
 
     public void addIdent (String ident) throws VariableException
     {
-        if (consts.containsKey(ident))
+        if (hasConstIdent(ident))
         {
             throw new VariableException(ident);
         }
@@ -48,7 +48,12 @@ public class Scope
 
     public boolean hasOwnIdent (String ident)
     {
-        return vars.indexOf(ident) != -1 || consts.containsKey(ident);
+        return vars.indexOf(ident) != -1 || hasConstIdent(ident);
+    }
+
+    public boolean hasConstIdent (String ident)
+    {
+        return consts.containsKey(ident);
     }
 
     public void replace (String oldIdent, String newIdent)

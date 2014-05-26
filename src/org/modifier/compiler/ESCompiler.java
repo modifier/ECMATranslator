@@ -71,7 +71,15 @@ public class ESCompiler
         }
 
         Translator translator = new Translator((NonTerminalNode)result);
-        translator.convert();
+        try
+        {
+            translator.convert();
+        }
+        catch (VariableException ex)
+        {
+            System.out.print(ex.getMessage());
+            return;
+        }
 
         System.out.print(result.toString());
     }

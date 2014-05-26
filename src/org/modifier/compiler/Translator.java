@@ -19,13 +19,13 @@ public class Translator
         root = node;
     }
 
-    public NonTerminalNode convert ()
+    public NonTerminalNode convert () throws VariableException
     {
         explore(root);
         return root;
     }
 
-    public void explore (NonTerminalNode root)
+    public void explore (NonTerminalNode root) throws VariableException
     {
         check(root);
 
@@ -38,7 +38,7 @@ public class Translator
         }
     }
 
-    public void check (NonTerminalNode node)
+    public void check (NonTerminalNode node) throws VariableException
     {
         if (
             node.getNodeClass() == TokenClass.get("FunctionExpression_1")
@@ -57,6 +57,41 @@ public class Translator
         )
         {
             convertLetInstruction(node);
+        }
+        else if (node.getNodeClass() == TokenClass.get("AssignmentExpression"))
+        {
+            checkConstInstruction(node);
+        }
+    }
+
+    private void checkConstInstruction (NonTerminalNode node) throws VariableException
+    {
+        NonTerminalNode rightSide = (NonTerminalNode)node.findNodeClass("BinaryExpression");
+        boolean hasAssignment = rightSide.findNodeClass("AssignmentOperator") != null;
+
+        if (!hasAssignment)
+        {
+            return;
+        }
+
+        Scope closestScope = node.closestVarBlock().getScope();
+        NonTerminalNode leftSide = (NonTerminalNode)node.findDeep("MemberExpression");
+        Node firstKid = leftSide.getChildren().get(0);
+        if (firstKid.getNodeClass() != TokenClass.get("PrimaryExpression"))
+        {
+            return;
+        }
+
+        Node subKid = ((NonTerminalNode)firstKid).getChildren().get(0);
+        if (subKid.getNodeClass() != TokenClass.get("Ident"))
+        {
+            return;
+        }
+
+        String ident = ((TerminalNode)subKid).getToken().value;
+        if (closestScope.hasConstIdent(ident))
+        {
+            throw new VariableException(ident);
         }
     }
 
