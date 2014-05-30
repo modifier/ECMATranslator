@@ -114,25 +114,39 @@ public class Scanner implements Iterable<Token>
         return getToken(finalString, TokenClass.get("Const"));
     }
 
-    private Token matchLiteral()
+    private Token continuousMatch(String tokenType)
     {
         // TODO: there is no line wrapping in javascript
-        // TODO: check quotation escaping
-        final char quoteType = stream.charAt(position++);
+        final char startCharacter = stream.charAt(position++);
         StringBuilder accumulator = new StringBuilder();
-        accumulator.append(quoteType);
-        char symbol;
+        accumulator.append(startCharacter);
+        char symbol = 0;
+        boolean escaping = false;
 
         do
         {
+            if ('\\' == symbol)
+            {
+                escaping = !escaping;
+            }
+            else
+            {
+                escaping = false;
+            }
+
             symbol = stream.charAt(position++);
             accumulator.append(symbol);
         }
-        while (quoteType != symbol);
+        while (!(startCharacter == symbol && !escaping));
 
         String finalString = accumulator.toString();
 
-        return getToken(finalString, TokenClass.get("Literal"));
+        return getToken(finalString, TokenClass.get(tokenType));
+    }
+
+    private Token matchLiteral()
+    {
+        return continuousMatch("Literal");
     }
 
     private ArrayList<Token> matchToken()
@@ -185,7 +199,7 @@ public class Scanner implements Iterable<Token>
 
     private Token matchRegex()
     {
-        return null;
+        return continuousMatch("Regex");
     }
 
     private void skipComment()
@@ -233,8 +247,7 @@ public class Scanner implements Iterable<Token>
 
     private boolean isRegex (char symbol)
     {
-        // TODO: implement regex literal
-        return false;
+        return '/' == symbol;
     }
 
     private boolean isComment (char symbol)
