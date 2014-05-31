@@ -7,13 +7,13 @@ public class TerminalReader
     private String input;
     private ArrayList<String> keywords = new ArrayList<>();
     private HashMap<String, ArrayList<String>> correspondence = new HashMap<>();
-    public TerminalReader (String input) throws Exception
+    public TerminalReader (String input) throws TerminalReaderException
     {
         this.input = input;
         this.process();
     }
 
-    private void process() throws Exception
+    private void process() throws TerminalReaderException
     {
         String[] rows = input.split("\n");
         for (String row : rows)
@@ -42,7 +42,7 @@ public class TerminalReader
 
                     if (value.equals(""))
                     {
-                        throw new Exception("Empty terminal");
+                        throw new TerminalReaderException("Empty terminal");
                     }
 
                     if (value.length() > 1)

@@ -6,6 +6,7 @@ import org.modifier.scanner.Lexer;
 import org.modifier.scanner.Scanner;
 import org.modifier.scanner.TokenClass;
 import org.modifier.utils.TerminalReader;
+import org.modifier.utils.TerminalReaderException;
 
 import java.io.*;
 import java.text.ParseException;
@@ -20,68 +21,25 @@ public class ESCompiler
 
         InputStream grammar = new FileInputStream(opts.get("g"));
 
-        TerminalReader reader;
-        try
-        {
-            reader = new TerminalReader(getStringFromInputStream(grammar));
-        }
-        catch (Exception exception)
-        {
-            // TODO: Handle exceptions
-            exception.printStackTrace();
-            return;
-        }
-
-        Scanner scanner = new Scanner(getStringFromInputStream(stream));
-        for (String word : reader.getKeywords())
-        {
-            scanner.reserve(word);
-        }
-
-        Lexer lexer = new Lexer(scanner);
-        lexer.setCorrespondence(reader.getCorrespondence());
-
-        AbstractSyntaxTable table = new SyntaxTable();
-        Parser parser = new Parser(lexer, table);
-
-        Node result = null;
+        ESParser parser = ESParser.get().setGrammar(getStringFromInputStream(grammar));
 
         try
         {
-            result = parser.getTree();
+            Node tree = parser.process(getStringFromInputStream(stream));
 
-//            printResult(result);
-        }
-        catch (SyntaxError syntaxError)
-        {
-            // TODO: Handle exceptions
-            syntaxError.printStackTrace();
-            return;
-        }
-
-        Scoper scoper = new Scoper((NonTerminalNode)result);
-        try
-        {
+            Scoper scoper = new Scoper((NonTerminalNode)tree);
             scoper.process();
-        }
-        catch (TypeError ex)
-        {
-            System.out.print(ex.getMessage());
-            return;
-        }
 
-        Translator translator = new Translator((NonTerminalNode)result);
-        try
-        {
+            Translator translator = new Translator((NonTerminalNode)tree);
             translator.convert();
+
+            System.out.print(tree.toString());
         }
-        catch (TypeError ex)
+        catch (Exception e)
         {
-            System.out.print(ex.getMessage());
+            System.out.print(e.getMessage());
             return;
         }
-
-        System.out.print(result.toString());
     }
 
     public static HashMap<String, String> parseOpts (String[] args) throws ParseException

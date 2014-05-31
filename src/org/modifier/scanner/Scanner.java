@@ -8,18 +8,18 @@ import java.util.Iterator;
 
 public class Scanner implements Iterable<Token>
 {
+    private final ArrayList<Token> result = new ArrayList<>();
     private final HashMap<String, Token> tokenList = new HashMap<>();
     private final String stream;
+    private int position;
 
     public Scanner(String stream)
     {
         this.stream = stream;
     }
 
-    private ArrayList<Token> scan ()
+    public ArrayList<Token> scan ()
     {
-        ArrayList<Token> result = new ArrayList<>();
-
         do
         {
             char symbol = stream.charAt(position);
@@ -257,11 +257,9 @@ public class Scanner implements Iterable<Token>
     }
     //</editor-fold>
 
-    private int position;
-
     @Override
     public Iterator<Token> iterator() {
-        return new TokenGenerator(scan());
+        return new TokenGenerator(result);
     }
 
     public void reserve (String keyword)
