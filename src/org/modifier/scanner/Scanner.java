@@ -18,7 +18,7 @@ public class Scanner implements Iterable<Token>
         this.stream = stream;
     }
 
-    public ArrayList<Token> scan ()
+    public ArrayList<Token> scan () throws ScannerException
     {
         do
         {
@@ -76,7 +76,6 @@ public class Scanner implements Iterable<Token>
     //<editor-fold desc="Matchers">
     private Token matchIdent()
     {
-        // TODO: idents may start with _
         char symbol;
 
         StringBuilder accumulator = new StringBuilder();
@@ -114,7 +113,7 @@ public class Scanner implements Iterable<Token>
         return getToken(finalString, TokenClass.get("Const"));
     }
 
-    private Token continuousMatch(String tokenType)
+    private Token continuousMatch(String tokenType) throws ScannerException
     {
         // TODO: there is no line wrapping in javascript
         final char startCharacter = stream.charAt(position++);
@@ -125,7 +124,11 @@ public class Scanner implements Iterable<Token>
 
         do
         {
-            if ('\\' == symbol)
+            if ('\n' == symbol)
+            {
+                throw new ScannerException("Unexpected end of the line.");
+            }
+            else if ('\\' == symbol)
             {
                 escaping = !escaping;
             }
@@ -144,7 +147,7 @@ public class Scanner implements Iterable<Token>
         return getToken(finalString, TokenClass.get(tokenType));
     }
 
-    private Token matchLiteral()
+    private Token matchLiteral() throws ScannerException
     {
         return continuousMatch("Literal");
     }
@@ -197,7 +200,7 @@ public class Scanner implements Iterable<Token>
         return result;
     }
 
-    private Token matchRegex()
+    private Token matchRegex() throws ScannerException
     {
         return continuousMatch("Regex");
     }

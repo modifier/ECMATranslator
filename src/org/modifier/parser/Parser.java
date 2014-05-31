@@ -14,7 +14,12 @@ public class Parser
     {
         this.scanner = scanner;
         this.table = table;
-        this.root = table.getRoot();
+        this.setRoot(table.getRoot());
+    }
+
+    public void setRoot(Node root)
+    {
+        this.root = root;
         this.linearTree.add(root);
     }
 
