@@ -40,6 +40,7 @@ public class SyntaxTable extends AbstractSyntaxTable
             else if (token.classId == TokenClass.get("Ident"))
             {
                 result.add(new TerminalNode(TokenClass.get("Ident")));
+                result.add(new NonTerminalNode(TokenClass.get("PrimaryExpression_1")));
             }
             else if (token.value.equals("["))
             {
@@ -54,6 +55,13 @@ public class SyntaxTable extends AbstractSyntaxTable
                 result.add(new TerminalNode("("));
                 result.add(new NonTerminalNode(TokenClass.get("Expression")));
                 result.add(new TerminalNode(")"));
+            }
+        }
+        else if (nodeClass == TokenClass.get("PrimaryExpression_1"))
+        {
+            if (token.classId == TokenClass.get("Quasiliteral"))
+            {
+                result.add(new TerminalNode(TokenClass.get("Quasiliteral")));
             }
         }
         else if (nodeClass == TokenClass.get("ArrayLiteral"))

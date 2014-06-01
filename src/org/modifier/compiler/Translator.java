@@ -70,7 +70,79 @@ public class Translator
         }
     }
 
-    private void checkQuasiliteral (NonTerminalNode node) throws ScanError
+    private void checkQuasiliteralCall(NonTerminalNode node) throws ScanError
+    {
+        TerminalNode foo = (TerminalNode) node.getChildren().get(0);
+        NonTerminalNode kid = (NonTerminalNode)node.getChildren().get(1);
+        if (kid.getChildren().size() == 0 || !(kid.getChildren().get(0) instanceof TerminalNode))
+        {
+            return;
+        }
+
+        Token quasi = ((TerminalNode) kid.getChildren().get(0)).getToken();
+
+        String value = quasi.value;
+        StringBuilder accumulator = new StringBuilder();
+        ArrayList<String> pieces = new ArrayList<>();
+        ArrayList<String> arguments = new ArrayList<>();
+        boolean escaping = false;
+        boolean isLiteral = true;
+        for (int i = 1; i < value.length(); i++)
+        {
+            char symbol = value.charAt(i);
+            if ('\\' == symbol)
+            {
+                escaping = !escaping;
+            }
+            else
+            {
+                escaping = false;
+            }
+
+            if (isLiteral)
+            {
+                if ('$' == symbol && !escaping)
+                {
+                    if ('{' != value.charAt(++i))
+                    {
+                        throw ScanError.incorrectQuasiliteral(quasi.getLine(), quasi.getPosition());
+                    }
+                    isLiteral = false;
+                    pieces.add('"' + accumulator.toString() + '"');
+                    accumulator = new StringBuilder();
+                }
+                else if ('`' == symbol)
+                {
+                    accumulator.append('"');
+                }
+                else
+                {
+                    accumulator.append(symbol);
+                }
+            }
+            else
+            {
+                if ('}' == symbol && !escaping)
+                {
+                    isLiteral = true;
+                    arguments.add(accumulator.toString());
+                    accumulator = new StringBuilder();
+                }
+                else
+                {
+                    accumulator.append(symbol);
+                }
+            }
+        }
+
+        String result = "(" + foo.getToken().value + "([" + StringUtils.join(pieces, ", ") + "], " + StringUtils.join(arguments, ", ") + "))";
+
+        NonTerminalNode tree = (NonTerminalNode)ESParser.get().processImmediate(result, TokenClass.get("PrimaryExpression"));
+
+        node.update(tree);
+    }
+
+    private void checkQuasiliteral(NonTerminalNode node) throws ScanError
     {
         Node kid = node.getChildren().get(0);
         if (!(kid instanceof TerminalNode))
@@ -79,6 +151,12 @@ public class Translator
         }
 
         Token quasi = ((TerminalNode) kid).getToken();
+
+        if (quasi.classId == TokenClass.get("Ident"))
+        {
+            checkQuasiliteralCall(node);
+            return;
+        }
 
         if (quasi.classId != TokenClass.get("Quasiliteral"))
         {
