@@ -7,24 +7,25 @@ public class Parser
 {
     private Iterable<Token> scanner;
     private AbstractSyntaxTable table;
-    private ArrayList<Node> linearTree = new ArrayList<>();
+    private ArrayList<Node> linearTree;
     private Node root;
 
     public Parser(Iterable<Token> scanner, AbstractSyntaxTable table)
     {
         this.scanner = scanner;
         this.table = table;
-        this.setRoot(table.getRoot());
+        this.root = table.getRoot();
     }
 
     public void setRoot(Node root)
     {
         this.root = root;
-        this.linearTree.add(root);
     }
 
     public Node getTree() throws SyntaxError
     {
+        linearTree =  new ArrayList<>();
+        linearTree.add(root);
         int pointer = 0;
         for(Token currentToken : scanner)
         {

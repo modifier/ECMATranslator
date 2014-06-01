@@ -238,46 +238,18 @@ public class Translator
             }
         }
 
-        NonTerminalNode lastSource = (NonTerminalNode)body.findNodeClass("SourceElement");
-        // And put them into the body
+        StringBuilder b = new StringBuilder();
         for (TerminalNode key : assignees.keySet())
         {
-            // TODO: Refactor using TreeGenerator
-            // Create condition
-            NonTerminalNode leftConditionPart = new NonTerminalNode("BinaryExpression");
-            leftConditionPart.appendChild(new TerminalNode("=="));
-            leftConditionPart.appendChild((Template.expression(new TerminalNode("null")).get(0)));
-
-            NonTerminalNode condition = Template.expression(key).get(0);
-            condition.appendChild(leftConditionPart);
-
-            // And then body
-            NonTerminalNode leftAssignmentPart = new NonTerminalNode("BinaryExpression");
-            leftAssignmentPart.appendChild(new TerminalNode("="));
-            leftAssignmentPart.appendChild(assignees.get(key));
-            NonTerminalNode assignment = Template.expression(key).get(0);
-            assignment.appendChild(leftAssignmentPart);
-            assignment.appendChild(new TerminalNode(";"));
-            NonTerminalNode innerExpression = new NonTerminalNode("Expression");
-            innerExpression.appendChild(assignment);
-            NonTerminalNode statement = new NonTerminalNode("Statement");
-            statement.appendChild(innerExpression);
-            NonTerminalNode slist = new NonTerminalNode("StatementList");
-            slist.appendChild(statement);
-
-            NonTerminalNode result = Template.ifStatement(condition, slist).get(0);
-            NonTerminalNode sourceElement = new NonTerminalNode("SourceElement");
-            sourceElement.appendChild(result);
-            sourceElement.appendChild(lastSource);
-
-            NonTerminalNode sourceElements = new NonTerminalNode("SourceElements");
-            sourceElements.appendChild(sourceElement);
-
-            lastSource = sourceElements;
+            b.append("if(" + key.getToken().value + " == null){" +
+                key.getToken().value + " = " + assignees.get(key).toString() + ";}");
         }
+        b.append(body.toString());
+
+        NonTerminalNode parsed = (NonTerminalNode)ESParser.get().processImmediate(b.toString(), TokenClass.get("SourceElement"));
 
         body.clearChildren();
-        body.appendChild(lastSource.getChildren().get(0));
+        body.update(parsed);
     }
 
     private void convertForOf(NonTerminalNode node)

@@ -1,12 +1,7 @@
 package org.modifier.compiler;
-
-import org.modifier.ecmascript.SyntaxTable;
 import org.modifier.parser.*;
-import org.modifier.scanner.Lexer;
-import org.modifier.scanner.Scanner;
 import org.modifier.scanner.TokenClass;
-import org.modifier.utils.TerminalReader;
-import org.modifier.utils.TerminalReaderException;
+import org.modifier.utils.PositionException;
 
 import java.io.*;
 import java.text.ParseException;
@@ -27,18 +22,18 @@ public class ESCompiler
         {
             Node tree = parser.process(getStringFromInputStream(stream));
 
-            Scoper scoper = new Scoper((NonTerminalNode)tree);
-            scoper.process();
-
             Translator translator = new Translator((NonTerminalNode)tree);
             translator.convert();
 
             System.out.print(tree.toString());
         }
-        catch (Exception e)
+        catch (PositionException e)
         {
             System.out.print(e.getMessage());
-            return;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
         }
     }
 

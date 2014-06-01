@@ -45,6 +45,10 @@ public class NonTerminalNode extends Node
     {
         this.children = anotherNode.children;
         this.tokenClass = anotherNode.tokenClass;
+        for (Node kid : children)
+        {
+            kid.setParent(this);
+        }
     }
 
     public NonTerminalNode clone ()

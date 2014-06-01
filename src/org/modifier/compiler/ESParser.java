@@ -1,13 +1,11 @@
 package org.modifier.compiler;
 
 import org.modifier.ecmascript.SyntaxTable;
-import org.modifier.parser.AbstractSyntaxTable;
-import org.modifier.parser.Node;
-import org.modifier.parser.Parser;
-import org.modifier.parser.SyntaxError;
+import org.modifier.parser.*;
 import org.modifier.scanner.Lexer;
 import org.modifier.scanner.ScanError;
 import org.modifier.scanner.Scanner;
+import org.modifier.scanner.TokenClass;
 import org.modifier.utils.TerminalReader;
 import org.modifier.utils.TerminalReaderException;
 
@@ -15,6 +13,7 @@ public class ESParser
 {
     private static ESParser parser;
     private String grammar;
+    private Node root = null;
 
     private ESParser() {}
 
@@ -34,7 +33,24 @@ public class ESParser
         return parser;
     }
 
-    public Node process(String stream) throws SyntaxError, TerminalReaderException, ScanError
+    public Node processImmediate(String stream, TokenClass root)
+    {
+        setRoot(new NonTerminalNode(root));
+        try
+        {
+            return process(stream);
+        }
+        catch(Exception e)
+        {
+            throw new RuntimeException();
+        }
+        finally
+        {
+            setRoot(null);
+        }
+    }
+
+    public Node process(String stream) throws SyntaxError, TerminalReaderException, ScanError, TypeError
     {
         TerminalReader reader = new TerminalReader(grammar);
 
@@ -51,6 +67,21 @@ public class ESParser
         AbstractSyntaxTable table = new SyntaxTable();
         Parser parser = new Parser(lexer, table);
 
-        return parser.getTree();
+        if (root != null)
+        {
+            parser.setRoot(root);
+        }
+
+        Node tree = parser.getTree();
+
+        Scoper scoper = new Scoper((NonTerminalNode)tree);
+        scoper.process();
+
+        return tree;
+    }
+
+    public void setRoot(Node root)
+    {
+        this.root = root;
     }
 }

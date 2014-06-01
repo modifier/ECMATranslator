@@ -189,7 +189,7 @@ public class Scanner implements Iterable<Token>
         {
             char symbol = stream.charAt(position++);
             matcher.append(symbol);
-        } while (matcher.isSolvable() && !matcher.hasSolution());
+        } while (matcher.isSolvable() && !matcher.hasSolution() && position < stream.length() - 1);
 
         String solution = matcher.getSolution();
         incPos(solution.length());
@@ -253,6 +253,10 @@ public class Scanner implements Iterable<Token>
 
     private boolean isComment (char symbol)
     {
+        if (position == stream.length() - 1)
+        {
+            return false;
+        }
         char nextSymbol = stream.charAt(position + 1);
         return ('/' == symbol) && ('/' == nextSymbol) || ('*' == nextSymbol);
     }
