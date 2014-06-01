@@ -6,8 +6,8 @@ import org.modifier.parser.Node;
 import org.modifier.parser.Parser;
 import org.modifier.parser.SyntaxError;
 import org.modifier.scanner.Lexer;
+import org.modifier.scanner.ScanError;
 import org.modifier.scanner.Scanner;
-import org.modifier.scanner.ScannerException;
 import org.modifier.utils.TerminalReader;
 import org.modifier.utils.TerminalReaderException;
 
@@ -34,7 +34,7 @@ public class ESParser
         return parser;
     }
 
-    public Node process(String stream) throws SyntaxError, TerminalReaderException, ScannerException
+    public Node process(String stream) throws SyntaxError, TerminalReaderException, ScanError
     {
         TerminalReader reader = new TerminalReader(grammar);
 

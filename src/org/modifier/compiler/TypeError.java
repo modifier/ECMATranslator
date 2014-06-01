@@ -1,26 +1,22 @@
 package org.modifier.compiler;
 
-public class TypeError extends Exception
+import org.modifier.scanner.Token;
+import org.modifier.utils.PositionException;
+
+public class TypeError extends PositionException
 {
-    private final String message;
-
-    private TypeError(String message)
+    private TypeError(String s, int line, int position)
     {
-        this.message = "[TypeError] " + message;
+        super("[TypeError] " + s, line, position);
     }
 
-    public static TypeError constantIsAlreadyDefined (String name)
+    public static TypeError constantIsAlreadyDefined (Token ident)
     {
-        return new TypeError("Constant " + name + " is already defined in current scope.");
+        return new TypeError("Constant " + ident.value + " is already defined in current scope", ident.getLine(), ident.getPosition());
     }
 
-    public static TypeError constantCannotBeRedefined (String name)
+    public static TypeError constantCannotBeRedefined (Token ident)
     {
-        return new TypeError("Constant " + name + " cannot be redefined.");
-    }
-
-    public String getMessage ()
-    {
-        return message;
+        return new TypeError("Constant " + ident.value + " cannot be redefined", ident.getLine(), ident.getPosition());
     }
 }

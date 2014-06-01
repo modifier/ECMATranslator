@@ -1,6 +1,7 @@
 package org.modifier.compiler;
 
 import org.modifier.parser.Node;
+import org.modifier.scanner.Token;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,22 +19,22 @@ public class Scope
         parentScope = parent;
     }
 
-    public void addIdent (String ident) throws TypeError
+    public void addIdent (Token ident) throws TypeError
     {
-        if (hasConstIdent(ident))
+        if (hasConstIdent(ident.value))
         {
             throw TypeError.constantIsAlreadyDefined(ident);
         }
-        vars.add(ident);
+        vars.add(ident.value);
     }
 
-    public void addConst (String ident, Node value) throws TypeError
+    public void addConst (Token ident, Node value) throws TypeError
     {
-        if (hasOwnIdent(ident))
+        if (hasOwnIdent(ident.value))
         {
             throw TypeError.constantIsAlreadyDefined(ident);
         }
-        consts.put(ident, value);
+        consts.put(ident.value, value);
     }
 
     public boolean hasIdent (String ident)

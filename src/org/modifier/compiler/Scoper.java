@@ -3,6 +3,7 @@ package org.modifier.compiler;
 import org.modifier.parser.Node;
 import org.modifier.parser.NonTerminalNode;
 import org.modifier.parser.TerminalNode;
+import org.modifier.scanner.Token;
 import org.modifier.scanner.TokenClass;
 
 import java.util.HashMap;
@@ -37,13 +38,13 @@ public class Scoper
 
     private void check (NonTerminalNode node) throws TypeError
     {
-        HashMap<String, Node> valueMap = new HashMap<>();
-        String name = null;
+        HashMap<Token, Node> valueMap = new HashMap<>();
+        Token functionName = null;
         boolean isVarScope = true;
         boolean isConst = false;
         if (node.getNodeClass() == TokenClass.get("FunctionDeclaration"))
         {
-            name = ((TerminalNode)(node).findNodeClass("Ident")).getToken().value;
+            functionName = ((TerminalNode)(node).findNodeClass("Ident")).getToken();
         }
         else if (node.getNodeClass() == TokenClass.get("FunctionExpression_1"))
         {
@@ -52,7 +53,7 @@ public class Scoper
             {
                 return;
             }
-            name = ((TerminalNode) first).getToken().value;
+            functionName = ((TerminalNode) first).getToken();
         }
         else if (node.getNodeClass() == TokenClass.get("ForStatement_1") || node.getNodeClass() == TokenClass.get("VariableStatement"))
         {
@@ -71,7 +72,7 @@ public class Scoper
 
                 TerminalNode ident = (TerminalNode)declaration.findNodeClass("Ident");
                 Node evaluation = ((NonTerminalNode)(declaration.findNodeClass("VariableDeclaration_1"))).findNodeClass("AssignmentExpression");
-                valueMap.put(ident.getToken().value, evaluation);
+                valueMap.put(ident.getToken(), evaluation);
 
                 currentList = (NonTerminalNode)currentList.findNodeClass("VariableDeclarationList_1");
             } while (currentList.getChildren().size() != 0);
@@ -82,7 +83,7 @@ public class Scoper
         }
 
         NonTerminalNode scope = isVarScope ? node.closestVarBlock() : node.closestLetBlock();
-        for (String ident : valueMap.keySet())
+        for (Token ident : valueMap.keySet())
         {
             if (isConst)
             {
@@ -94,9 +95,9 @@ public class Scoper
             }
         }
 
-        if (name != null)
+        if (functionName != null)
         {
-            scope.getScope().addIdent(name);
+            scope.getScope().addIdent(functionName);
         }
     }
 }

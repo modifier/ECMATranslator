@@ -11,47 +11,76 @@ public class Scanner implements Iterable<Token>
     private final ArrayList<String> tokenList = new ArrayList<>();
     private final String stream;
     private int position;
+    private int line = 1;
+    private int linePos = 0;
 
     public Scanner(String stream)
     {
         this.stream = stream;
     }
 
-    public ArrayList<Token> scan () throws ScannerException
+    private int incPos()
+    {
+        if (stream.charAt(position) == '\n')
+        {
+            line++;
+            linePos = 0;
+        }
+        linePos++;
+        return position++;
+    }
+
+    private int incPos(int count)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            incPos();
+        }
+
+        return position;
+    }
+
+    public ArrayList<Token> scan () throws ScanError
     {
         do
         {
             char symbol = stream.charAt(position);
+            int line = this.line, linePos = this.linePos;
+            Token token;
 
             if (isWhitespace(symbol))
             {
-                position++;
+                incPos();
                 continue;
             }
             if (isAlpha(symbol))
             {
-                result.add(matchIdent());
+                token = matchIdent();
             }
             else if (isDigit(symbol))
             {
-                result.add(matchConst());
+                token = matchConst();
             }
             else if (isLiteral(symbol))
             {
-                result.add(matchLiteral());
+                token = matchLiteral();
             }
             else if (isRegex(symbol))
             {
-                result.add(matchRegex());
+                token = matchRegex();
             }
             else if (isComment(symbol))
             {
                 skipComment();
+                continue;
             }
             else
             {
-                result.add(matchToken());
+                token = matchToken();
             }
+
+            token.setPosition(line, linePos);
+            result.add(token);
         } while (stream.length() > position);
 
         return result;
@@ -80,7 +109,7 @@ public class Scanner implements Iterable<Token>
         StringBuilder accumulator = new StringBuilder();
         do
         {
-            symbol = stream.charAt(position++);
+            symbol = stream.charAt(incPos());
             accumulator.append(symbol);
         }
         while (isAlpha(getLookahead()) || isDigit(getLookahead()));
@@ -99,7 +128,7 @@ public class Scanner implements Iterable<Token>
         Boolean wasPoint = false;
         do
         {
-            symbol = stream.charAt(position++);
+            symbol = stream.charAt(incPos());
             accumulator.append(symbol);
             if ('.' == symbol) {
                 wasPoint = true;
@@ -112,10 +141,9 @@ public class Scanner implements Iterable<Token>
         return getToken(finalString, TokenClass.get("Const"));
     }
 
-    private Token continuousMatch(String tokenType) throws ScannerException
+    private Token continuousMatch(String tokenType) throws ScanError
     {
-        // TODO: there is no line wrapping in javascript
-        final char startCharacter = stream.charAt(position++);
+        final char startCharacter = stream.charAt(incPos());
         StringBuilder accumulator = new StringBuilder();
         accumulator.append(startCharacter);
         char symbol = 0;
@@ -123,11 +151,12 @@ public class Scanner implements Iterable<Token>
 
         do
         {
-            if ('\n' == symbol)
+            if ('\n' == getLookahead())
             {
-                throw new ScannerException("Unexpected end of the line.");
+                throw ScanError.unexpectedEOL(line, linePos);
             }
-            else if ('\\' == symbol)
+
+            if ('\\' == symbol)
             {
                 escaping = !escaping;
             }
@@ -136,7 +165,7 @@ public class Scanner implements Iterable<Token>
                 escaping = false;
             }
 
-            symbol = stream.charAt(position++);
+            symbol = stream.charAt(incPos());
             accumulator.append(symbol);
         }
         while (!(startCharacter == symbol && !escaping));
@@ -146,7 +175,7 @@ public class Scanner implements Iterable<Token>
         return getToken(finalString, TokenClass.get(tokenType));
     }
 
-    private Token matchLiteral() throws ScannerException
+    private Token matchLiteral() throws ScanError
     {
         return continuousMatch("Literal");
     }
@@ -163,19 +192,19 @@ public class Scanner implements Iterable<Token>
         } while (matcher.isSolvable() && !matcher.hasSolution());
 
         String solution = matcher.getSolution();
-        this.position += solution.length();
+        incPos(solution.length());
 
         return getToken(solution, TokenClass.get("Other"));
     }
 
-    private Token matchRegex() throws ScannerException
+    private Token matchRegex() throws ScanError
     {
         return continuousMatch("Regex");
     }
 
     private void skipComment()
     {
-        Boolean isBlockComment = stream.charAt(++position) == '*';
+        Boolean isBlockComment = stream.charAt(incPos() + 1) == '*';
 
         do
         {
@@ -188,7 +217,7 @@ public class Scanner implements Iterable<Token>
 
             if ('*' == symbol && '/' == getLookahead() && isBlockComment)
             {
-                position++;
+                incPos();
                 return;
             }
         } while (position < stream.length());
@@ -218,6 +247,7 @@ public class Scanner implements Iterable<Token>
 
     private boolean isRegex (char symbol)
     {
+        // TODO: check whether line is a regex or a division symbol
         return '/' == symbol;
     }
 

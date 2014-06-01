@@ -44,7 +44,7 @@ public class Parser
 
             if (!((TerminalNode)currentRule).fitsToken(currentToken))
             {
-                throw new SyntaxError();
+                throw SyntaxError.unexpectedToken(currentToken, ((TerminalNode) currentRule).getToken());
             }
 
             ((TerminalNode) currentRule).setToken(currentToken);

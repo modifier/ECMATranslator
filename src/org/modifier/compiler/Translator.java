@@ -88,8 +88,8 @@ public class Translator
             return;
         }
 
-        String ident = ((TerminalNode)subKid).getToken().value;
-        if (closestScope.hasConstIdent(ident))
+        Token ident = ((TerminalNode)subKid).getToken();
+        if (closestScope.hasConstIdent(ident.value))
         {
             throw TypeError.constantCannotBeRedefined(ident);
         }

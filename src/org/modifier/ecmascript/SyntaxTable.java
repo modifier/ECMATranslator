@@ -103,13 +103,9 @@ public class SyntaxTable extends AbstractSyntaxTable
             {
                 result.add(new TerminalNode(TokenClass.get("Ident")));
             }
-            else if (token.classId == TokenClass.get("Literal"))
-            {
-                result.add(new TerminalNode(TokenClass.get("Literal")));
-            }
             else
             {
-                throw new SyntaxError();
+                result.add(new TerminalNode(TokenClass.get("Literal")));
             }
         }
         else if (nodeClass == TokenClass.get("Expression"))
@@ -571,7 +567,7 @@ public class SyntaxTable extends AbstractSyntaxTable
         }
         else
         {
-            throw new SyntaxError();
+            throw SyntaxError.unknownRule(nodeClass, token.getLine(), token.getPosition());
         }
         return result;
     }

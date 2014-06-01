@@ -11,11 +11,10 @@ public abstract class AbstractSyntaxTable
         {
             return getRule(token, (NonTerminalNode)node);
         }
-        else if (node instanceof TerminalNode)
+        else
         {
             return getRule(token, (TerminalNode)node);
         }
-        throw new SyntaxError();
     }
 
     abstract public ArrayList<Node> getRule(Token token, NonTerminalNode currentNode) throws SyntaxError;
