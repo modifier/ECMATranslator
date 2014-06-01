@@ -1,8 +1,10 @@
 package org.modifier.compiler;
 
+import com.sun.deploy.util.StringUtils;
 import org.modifier.parser.Node;
 import org.modifier.parser.NonTerminalNode;
 import org.modifier.parser.TerminalNode;
+import org.modifier.scanner.ScanError;
 import org.modifier.scanner.Token;
 import org.modifier.scanner.TokenClass;
 import org.modifier.utils.TreeGenerator;
@@ -19,13 +21,13 @@ public class Translator
         root = node;
     }
 
-    public NonTerminalNode convert () throws TypeError
+    public NonTerminalNode convert () throws TypeError, ScanError
     {
         explore(root);
         return root;
     }
 
-    public void explore (NonTerminalNode root) throws TypeError
+    public void explore (NonTerminalNode root) throws TypeError, ScanError
     {
         check(root);
 
@@ -38,7 +40,7 @@ public class Translator
         }
     }
 
-    public void check (NonTerminalNode node) throws TypeError
+    public void check (NonTerminalNode node) throws TypeError, ScanError
     {
         if (
             node.getNodeClass() == TokenClass.get("FunctionExpression_1")
@@ -62,6 +64,85 @@ public class Translator
         {
             checkConstInstruction(node);
         }
+        else if (node.getNodeClass() == TokenClass.get("PrimaryExpression"))
+        {
+            checkQuasiliteral(node);
+        }
+    }
+
+    private void checkQuasiliteral (NonTerminalNode node) throws ScanError
+    {
+        Node kid = node.getChildren().get(0);
+        if (!(kid instanceof TerminalNode))
+        {
+            return;
+        }
+
+        Token quasi = ((TerminalNode) kid).getToken();
+
+        if (quasi.classId != TokenClass.get("Quasiliteral"))
+        {
+            return;
+        }
+
+        String value = ((TerminalNode) kid).getToken().value;
+        StringBuilder accumulator = new StringBuilder();
+        ArrayList<String> pieces = new ArrayList<>();
+        boolean escaping = false;
+        boolean isLiteral = true;
+        for (int i = 1; i < value.length(); i++)
+        {
+            char symbol = value.charAt(i);
+            if ('\\' == symbol)
+            {
+                escaping = !escaping;
+            }
+            else
+            {
+                escaping = false;
+            }
+
+            if (isLiteral)
+            {
+                if ('$' == symbol && !escaping)
+                {
+                    if ('{' != value.charAt(++i))
+                    {
+                        throw ScanError.incorrectQuasiliteral(quasi.getLine(), quasi.getPosition());
+                    }
+                    isLiteral = false;
+                    pieces.add('"' + accumulator.toString() + '"');
+                    accumulator = new StringBuilder();
+                }
+                else if ('`' == symbol)
+                {
+                    accumulator.append('"');
+                }
+                else
+                {
+                    accumulator.append(symbol);
+                }
+            }
+            else
+            {
+                if ('}' == symbol && !escaping)
+                {
+                    isLiteral = true;
+                    pieces.add(accumulator.toString());
+                    accumulator = new StringBuilder();
+                }
+                else
+                {
+                    accumulator.append(symbol);
+                }
+            }
+        }
+        String result = "(" + StringUtils.join(pieces, " + ") + ")";
+
+        NonTerminalNode tree = (NonTerminalNode)ESParser.get().processImmediate(result, TokenClass.get("Expression"));
+
+        node.clearChildren();
+        node.appendChild(tree);
     }
 
     private void checkConstInstruction (NonTerminalNode node) throws TypeError

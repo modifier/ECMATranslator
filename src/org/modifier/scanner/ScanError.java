@@ -13,4 +13,9 @@ public class ScanError extends PositionException
     {
         return new ScanError("Unexpected end of line", line, position);
     }
+
+    public static ScanError incorrectQuasiliteral (int line, int position)
+    {
+        return new ScanError("Incorrect quasi literal", line, position);
+    }
 }

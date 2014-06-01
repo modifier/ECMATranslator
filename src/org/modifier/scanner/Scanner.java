@@ -69,6 +69,10 @@ public class Scanner implements Iterable<Token>
             {
                 token = matchRegex();
             }
+            else if (isQuasi(symbol))
+            {
+                token = matchQuasi();
+            }
             else if (isComment(symbol))
             {
                 skipComment();
@@ -202,6 +206,11 @@ public class Scanner implements Iterable<Token>
         return continuousMatch("Regex");
     }
 
+    private Token matchQuasi() throws ScanError
+    {
+        return continuousMatch("Quasiliteral");
+    }
+
     private void skipComment()
     {
         Boolean isBlockComment = stream.charAt(incPos() + 1) == '*';
@@ -249,6 +258,11 @@ public class Scanner implements Iterable<Token>
     {
         // TODO: check whether line is a regex or a division symbol
         return '/' == symbol;
+    }
+
+    private boolean isQuasi (char symbol)
+    {
+        return '`' == symbol;
     }
 
     private boolean isComment (char symbol)

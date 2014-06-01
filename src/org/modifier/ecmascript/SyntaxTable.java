@@ -25,6 +25,10 @@ public class SyntaxTable extends AbstractSyntaxTable
             {
                 result.add(new TerminalNode(TokenClass.get("Literal")));
             }
+            else if (token.classId == TokenClass.get("Quasiliteral"))
+            {
+                result.add(new TerminalNode(TokenClass.get("Quasiliteral")));
+            }
             else if (token.classId == TokenClass.get("Regex"))
             {
                 result.add(new TerminalNode(TokenClass.get("Regex")));
