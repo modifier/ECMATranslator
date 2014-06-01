@@ -1,15 +1,14 @@
 package org.modifier.scanner;
 
-import org.modifier.utils.FilteredSet;
+import org.modifier.utils.LongestMatch;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 
 public class Scanner implements Iterable<Token>
 {
     private final ArrayList<Token> result = new ArrayList<>();
-    private final HashMap<String, Token> tokenList = new HashMap<>();
+    private final ArrayList<String> tokenList = new ArrayList<>();
     private final String stream;
     private int position;
 
@@ -51,7 +50,7 @@ public class Scanner implements Iterable<Token>
             }
             else
             {
-                result.addAll(matchToken());
+                result.add(matchToken());
             }
         } while (stream.length() > position);
 
@@ -60,12 +59,12 @@ public class Scanner implements Iterable<Token>
 
     private Token getToken(String key, TokenClass classId)
     {
-        if (tokenList.get(key) == null)
+        if (tokenList.contains(key))
         {
-            tokenList.put(key, new Token(key, classId));
+            classId = TokenClass.get("Other");
         }
 
-        return tokenList.get(key);
+        return new Token(key, classId);
     }
 
     private char getLookahead()
@@ -152,52 +151,21 @@ public class Scanner implements Iterable<Token>
         return continuousMatch("Literal");
     }
 
-    private ArrayList<Token> matchToken()
+    private Token matchToken()
     {
-        ArrayList<Token> result = new ArrayList<>();
-
-        StringBuilder accumulator = new StringBuilder();
-        char symbol;
-
-        FilteredSet keys = new FilteredSet(tokenList.keySet());
-
-        ArrayList<String> tokenStrings = new ArrayList<>();
-        boolean added = false;
+        int position = this.position;
+        LongestMatch matcher = new LongestMatch(tokenList);
 
         do
         {
-            symbol = stream.charAt(position++);
-            accumulator.append(symbol);
+            char symbol = stream.charAt(position++);
+            matcher.append(symbol);
+        } while (matcher.isSolvable() && !matcher.hasSolution());
 
-            // TODO: make correct fallback to values longer than 1 symbol
-            if (!keys.containsPartialKey(accumulator.toString()))
-            {
-                String tokenString = accumulator.toString();
-                for (int i = 0; i < tokenString.length(); i++)
-                {
-                    tokenStrings.add(String.valueOf(tokenString.charAt(i)));
-                }
-                added = true;
-            }
+        String solution = matcher.getSolution();
+        this.position += solution.length();
 
-            if (1 == keys.size() && keys.contains(accumulator.toString())) {
-                tokenStrings.add(accumulator.toString());
-                added = true;
-                break;
-            }
-        }
-        while (!isWhitespace(getLookahead()) && !isAlpha(getLookahead()) && !isDigit(getLookahead()) && (0 != keys.size()));
-
-        if (keys.size() >= 1 && !added)
-        {
-            tokenStrings.add(accumulator.toString());
-        }
-
-        for (String tokenString : tokenStrings) {
-            result.add(getToken(tokenString, TokenClass.get("Other")));
-        }
-
-        return result;
+        return getToken(solution, TokenClass.get("Other"));
     }
 
     private Token matchRegex() throws ScannerException
@@ -267,6 +235,6 @@ public class Scanner implements Iterable<Token>
 
     public void reserve (String keyword)
     {
-        tokenList.put(keyword, new Token(keyword, TokenClass.get("Other")));
+        tokenList.add(keyword);
     }
 }
