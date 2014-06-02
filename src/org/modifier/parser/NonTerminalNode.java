@@ -133,16 +133,14 @@ public class NonTerminalNode extends Node
 
     public boolean isVarBlock()
     {
-        return tokenClass == TokenClass.get("FunctionDeclaration")
-            || tokenClass == TokenClass.get("FunctionExpression")
+        return tokenClass == TokenClass.get("FunctionBody")
             || tokenClass == TokenClass.get("Program");
     }
 
     public NonTerminalNode closestVarBlock()
     {
         ArrayList<String> varScope = new ArrayList<>();
-        varScope.add("FunctionDeclaration");
-        varScope.add("FunctionExpression");
+        varScope.add("FunctionBody");
         varScope.add("Program");
         return (NonTerminalNode)closest(varScope);
     }

@@ -19,6 +19,9 @@
 "var"
 "while"
 "of"
+"class"
+"super"
+"extends"
 PostfixOperator	        ::=	( "++" | "--" )
 UnaryOperator	        ::=	( "delete" | "void" | "typeof" | "++" | "--" | "~" | "!" )
 BinaryOperator          ::= "*" | "/" | "<" | ">" | "<=" | ">=" | "instanceof" | "in" | "<<" | ">>" | ">>>" | "==" | "!=" | "===" | "!==" | "&" | "^" | "|" | "&&" | "||"

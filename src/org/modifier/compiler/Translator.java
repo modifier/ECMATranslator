@@ -7,6 +7,8 @@ import org.modifier.parser.TerminalNode;
 import org.modifier.scanner.ScanError;
 import org.modifier.scanner.Token;
 import org.modifier.scanner.TokenClass;
+import org.modifier.utils.PositionException;
+import org.modifier.utils.TerminalReaderException;
 import org.modifier.utils.TreeGenerator;
 import org.modifier.utils.Template;
 
@@ -21,13 +23,13 @@ public class Translator
         root = node;
     }
 
-    public NonTerminalNode convert () throws TypeError, ScanError
+    public NonTerminalNode convert () throws PositionException, TerminalReaderException
     {
         explore(root);
         return root;
     }
 
-    public void explore (NonTerminalNode root) throws TypeError, ScanError
+    public void explore (NonTerminalNode root) throws PositionException, TerminalReaderException
     {
         check(root);
 
@@ -40,11 +42,10 @@ public class Translator
         }
     }
 
-    public void check (NonTerminalNode node) throws TypeError, ScanError
+    public void check (NonTerminalNode node) throws PositionException, TerminalReaderException
     {
         if (
-            node.getNodeClass() == TokenClass.get("FunctionExpression_1")
-            || node.getNodeClass() == TokenClass.get("FunctionDeclaration")
+            node.getNodeClass() == TokenClass.get("FunctionBody")
         )
         {
             convertFunction(node);
@@ -70,7 +71,7 @@ public class Translator
         }
     }
 
-    private void checkQuasiliteralCall(NonTerminalNode node) throws ScanError
+    private void checkQuasiliteralCall(NonTerminalNode node) throws PositionException, TerminalReaderException
     {
         TerminalNode foo = (TerminalNode) node.getChildren().get(0);
         NonTerminalNode kid = (NonTerminalNode)node.getChildren().get(1);
@@ -137,12 +138,10 @@ public class Translator
 
         String result = "(" + foo.getToken().value + "([" + StringUtils.join(pieces, ", ") + "], " + StringUtils.join(arguments, ", ") + "))";
 
-        NonTerminalNode tree = (NonTerminalNode)ESParser.get().processImmediate(result, TokenClass.get("PrimaryExpression"));
-
-        node.update(tree);
+        NonTerminalNode tree = (NonTerminalNode)ESParser.get().processImmediate(result, node);
     }
 
-    private void checkQuasiliteral(NonTerminalNode node) throws ScanError
+    private void checkQuasiliteral(NonTerminalNode node) throws PositionException, TerminalReaderException
     {
         Node kid = node.getChildren().get(0);
         if (!(kid instanceof TerminalNode))
@@ -217,10 +216,8 @@ public class Translator
         }
         String result = "(" + StringUtils.join(pieces, " + ") + ")";
 
-        NonTerminalNode tree = (NonTerminalNode)ESParser.get().processImmediate(result, TokenClass.get("Expression"));
-
         node.clearChildren();
-        node.appendChild(tree);
+        NonTerminalNode tree = (NonTerminalNode)ESParser.get().processImmediate(result, node);
     }
 
     private void checkConstInstruction (NonTerminalNode node) throws TypeError
@@ -352,7 +349,7 @@ public class Translator
         }
     }
 
-    private void convertFunction (NonTerminalNode node)
+    private void convertFunction (NonTerminalNode node) throws TerminalReaderException, PositionException
     {
         // Find necessary kids first
         NonTerminalNode functionDeclaration = (NonTerminalNode)node.findNodeClass("FunctionDeclaration_1");
@@ -405,10 +402,8 @@ public class Translator
         }
         b.append(body.toString());
 
-        NonTerminalNode parsed = (NonTerminalNode)ESParser.get().processImmediate(b.toString(), TokenClass.get("SourceElement"));
-
         body.clearChildren();
-        body.update(parsed);
+        NonTerminalNode parsed = (NonTerminalNode)ESParser.get().processImmediate(b.toString(), body);
     }
 
     private void convertForOf(NonTerminalNode node)

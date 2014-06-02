@@ -6,6 +6,7 @@ import org.modifier.scanner.Lexer;
 import org.modifier.scanner.ScanError;
 import org.modifier.scanner.Scanner;
 import org.modifier.scanner.TokenClass;
+import org.modifier.utils.PositionException;
 import org.modifier.utils.TerminalReader;
 import org.modifier.utils.TerminalReaderException;
 
@@ -33,16 +34,12 @@ public class ESParser
         return parser;
     }
 
-    public Node processImmediate(String stream, TokenClass root)
+    public Node processImmediate(String stream, NonTerminalNode root) throws PositionException, TerminalReaderException
     {
-        setRoot(new NonTerminalNode(root));
+        setRoot(root);
         try
         {
             return process(stream);
-        }
-        catch(Exception e)
-        {
-            throw new RuntimeException();
         }
         finally
         {

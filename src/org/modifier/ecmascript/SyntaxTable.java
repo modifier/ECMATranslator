@@ -256,6 +256,16 @@ public class SyntaxTable extends AbstractSyntaxTable
             {
                 result.add(new TerminalNode(TokenClass.get("Ident")));
             }
+            result.add(new NonTerminalNode(TokenClass.get("FunctionBody")));
+        }
+        else if (nodeClass == TokenClass.get("FunctionDeclaration"))
+        {
+            result.add(new TerminalNode("function"));
+            result.add(new TerminalNode(TokenClass.get("Ident")));
+            result.add(new NonTerminalNode(TokenClass.get("FunctionBody")));
+        }
+        else if (nodeClass == TokenClass.get("FunctionBody"))
+        {
             result.add(new TerminalNode("("));
             result.add(new NonTerminalNode(TokenClass.get("FunctionDeclaration_1")));
             result.add(new TerminalNode(")"));
@@ -263,16 +273,40 @@ public class SyntaxTable extends AbstractSyntaxTable
             result.add(new NonTerminalNode(TokenClass.get("SourceElements")));
             result.add(new TerminalNode("}"));
         }
-        else if (nodeClass == TokenClass.get("FunctionDeclaration"))
+        else if (nodeClass == TokenClass.get("ClassDeclaration"))
         {
-            result.add(new TerminalNode("function"));
+            result.add(new TerminalNode("class"));
             result.add(new TerminalNode(TokenClass.get("Ident")));
-            result.add(new TerminalNode("("));
-            result.add(new NonTerminalNode(TokenClass.get("FunctionDeclaration_1")));
-            result.add(new TerminalNode(")"));
+            result.add(new NonTerminalNode(TokenClass.get("ClassDeclaration_1")));
             result.add(new TerminalNode("{"));
-            result.add(new NonTerminalNode(TokenClass.get("SourceElements")));
+            result.add(new NonTerminalNode(TokenClass.get("ClassMethods")));
             result.add(new TerminalNode("}"));
+        }
+        else if (nodeClass == TokenClass.get("ClassDeclaration_1"))
+        {
+            if (token.value.equals("extends"))
+            {
+                result.add(new TerminalNode("extends"));
+                result.add(new TerminalNode(TokenClass.get("Ident")));
+            }
+        }
+        else if (nodeClass == TokenClass.get("ClassBody"))
+        {
+            if (token.classId == TokenClass.get("<EOF>") || token.value.equals("}"))
+            {
+                return result;
+            }
+            result.add(new NonTerminalNode(TokenClass.get("ClassElement")));
+        }
+        else if (nodeClass == TokenClass.get("ClassElement"))
+        {
+            result.add(new NonTerminalNode(TokenClass.get("ClassMethod")));
+            result.add(new NonTerminalNode(TokenClass.get("ClassBody")));
+        }
+        else if (nodeClass == TokenClass.get("ClassMethod"))
+        {
+            result.add(new TerminalNode(TokenClass.get("Ident")));
+            result.add(new NonTerminalNode(TokenClass.get("FunctionBody")));
         }
         else if (nodeClass == TokenClass.get("FunctionDeclaration_1"))
         {
@@ -294,6 +328,10 @@ public class SyntaxTable extends AbstractSyntaxTable
             if (token.value.equals("function"))
             {
                 result.add(new NonTerminalNode(TokenClass.get("FunctionDeclaration")));
+            }
+            else if (token.value.equals("class"))
+            {
+                result.add(new NonTerminalNode(TokenClass.get("ClassDeclaration")));
             }
             else
             {
