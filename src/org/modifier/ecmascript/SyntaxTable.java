@@ -194,12 +194,30 @@ public class SyntaxTable extends AbstractSyntaxTable
         }
         else if (nodeClass == TokenClass.get("LeftHandSideExpression"))
         {
-            result.add(new NonTerminalNode(TokenClass.get("MemberExpression")));
-            result.add(new NonTerminalNode(TokenClass.get("LeftHandSideExpression_1")));
+            if (token.value.equals("super"))
+            {
+                result.add(new TerminalNode("super"));
+                result.add(new NonTerminalNode(TokenClass.get("LeftHandSideExpression_1")));
+                result.add(new NonTerminalNode(TokenClass.get("LeftHandSideExpression_2")));
+            }
+            else
+            {
+                result.add(new NonTerminalNode(TokenClass.get("MemberExpression")));
+            }
         }
         else if (nodeClass == TokenClass.get("LeftHandSideExpression_1"))
         {
-
+            if (token.value.equals("."))
+            {
+                result.add(new TerminalNode("."));
+                result.add(new TerminalNode(TokenClass.get("Ident")));
+            }
+        }
+        else if (nodeClass == TokenClass.get("LeftHandSideExpression_2"))
+        {
+            result.add(new TerminalNode("("));
+            result.add(new NonTerminalNode(TokenClass.get("Expression")));
+            result.add(new TerminalNode(")"));
         }
         else if (nodeClass == TokenClass.get("MemberExpression"))
         {
@@ -279,7 +297,7 @@ public class SyntaxTable extends AbstractSyntaxTable
             result.add(new TerminalNode(TokenClass.get("Ident")));
             result.add(new NonTerminalNode(TokenClass.get("ClassDeclaration_1")));
             result.add(new TerminalNode("{"));
-            result.add(new NonTerminalNode(TokenClass.get("ClassMethods")));
+            result.add(new NonTerminalNode(TokenClass.get("ClassBody")));
             result.add(new TerminalNode("}"));
         }
         else if (nodeClass == TokenClass.get("ClassDeclaration_1"))

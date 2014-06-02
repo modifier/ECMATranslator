@@ -61,6 +61,10 @@ public class Translator
         {
             convertLetInstruction(node);
         }
+        else if (node.getNodeClass() == TokenClass.get("LeftHandSideExpression"))
+        {
+            checkSuperInstruction(node);
+        }
         else if (node.getNodeClass() == TokenClass.get("AssignmentExpression"))
         {
             checkConstInstruction(node);
@@ -69,6 +73,107 @@ public class Translator
         {
             checkQuasiliteral(node);
         }
+        else if (node.getNodeClass() == TokenClass.get("SourceElement")
+            && node.getChildren().get(0).getNodeClass() == TokenClass.get("ClassDeclaration"))
+        {
+            checkClassDeclaration(node);
+        }
+    }
+
+    private void checkSuperInstruction(NonTerminalNode node) throws TerminalReaderException, PositionException
+    {
+        if (!(node.getChildren().get(0) instanceof TerminalNode))
+        {
+            return;
+        }
+
+        NonTerminalNode tail = (NonTerminalNode)node.findNodeClass("LeftHandSideExpression_1");
+        NonTerminalNode arguments = (NonTerminalNode)node.findNodeClass("LeftHandSideExpression_2");
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("this.parent.prototype");
+        if (tail.getChildren().size() == 0)
+        {
+            builder.append(".constructor");
+        }
+        else
+        {
+            builder.append(tail.toString());
+        }
+        String args = arguments.findNodeClass("Expression").toString();
+
+        builder.append(".call(this");
+        if (!args.equals(""))
+        {
+            builder.append(",").append(args);
+        }
+        builder.append(")");
+
+        node.clearChildren();
+        NonTerminalNode tree = (NonTerminalNode)ESParser.get().processImmediate(builder.toString(), node);
+    }
+
+    private void checkClassDeclaration(NonTerminalNode sourceElement) throws TerminalReaderException, PositionException
+    {
+        NonTerminalNode node = (NonTerminalNode) sourceElement.findNodeClass("ClassDeclaration");
+        Node siblings = sourceElement.findNodeClass("SourceElements");
+
+        String className = ((TerminalNode) node.findNodeClass("Ident")).getToken().value;
+        NonTerminalNode extender = (NonTerminalNode)node.findNodeClass("ClassDeclaration_1");
+        String parentName;
+        if (extender.findNodeClass("Ident") != null)
+        {
+            parentName = ((TerminalNode)extender.findNodeClass("Ident")).getToken().value;
+        }
+        else
+        {
+            parentName = "Object";
+        }
+
+        HashMap<String, Node> methods = new HashMap<>();
+        NonTerminalNode classBody = (NonTerminalNode)node.findNodeClass("ClassBody");
+        do
+        {
+            NonTerminalNode classElement = (NonTerminalNode)classBody.findNodeClass("ClassElement");
+
+            String methodName = ((TerminalNode)classElement.findDeep("Ident")).getToken().value;
+            methods.put(methodName, classElement.findDeep("FunctionBody"));
+
+            classBody = (NonTerminalNode)classElement.findNodeClass("ClassBody");
+        } while (classBody.getChildren().size() != 0);
+
+        // Function declaration
+        StringBuilder builder = new StringBuilder();
+        builder.append("var ").append(className).append(" = function ");
+        if (methods.containsKey("constructor"))
+        {
+            builder.append(methods.get("constructor").toString());
+        }
+        else
+        {
+            builder.append("(){}");
+        }
+        builder.append(";");
+
+        // Body
+        builder.append(className).append(".prototype = Object.create(").append(parentName).append(".prototype);");
+        for (String method : methods.keySet())
+        {
+            if (method.equals("constructor"))
+            {
+                continue;
+            }
+
+            builder.append(className).append(".prototype.").append(method).append(" = function").append(methods.get(method).toString()).append(";");
+        }
+
+        // Constructor and super
+        builder.append(className).append(".prototype.constructor = ").append(className).append(";");
+        builder.append(className).append(".prototype.parent = ").append(parentName).append(";");
+
+        sourceElement.clearChildren();
+        NonTerminalNode tree = (NonTerminalNode)ESParser.get().processImmediate(builder.toString(), sourceElement);
+        sourceElement.appendChild(siblings);
     }
 
     private void checkQuasiliteralCall(NonTerminalNode node) throws PositionException, TerminalReaderException
@@ -143,6 +248,11 @@ public class Translator
 
     private void checkQuasiliteral(NonTerminalNode node) throws PositionException, TerminalReaderException
     {
+        if (node.getChildren().size() == 0)
+        {
+            return;
+        }
+
         Node kid = node.getChildren().get(0);
         if (!(kid instanceof TerminalNode))
         {
