@@ -1,6 +1,6 @@
 package org.modifier.scanner;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import org.modifier.utils.NotImplementedException;
 
 import java.util.Iterator;
 import java.util.List;
