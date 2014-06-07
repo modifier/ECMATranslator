@@ -11,27 +11,58 @@ public class ESCompiler
 {
     public static void main (String[] args) throws ParseException, FileNotFoundException
     {
-        Map<String, String> opts = parseOpts(args);
-        InputStream stream = new FileInputStream(opts.get("i"));
-
-        InputStream grammar = new FileInputStream(opts.get("g"));
-
-        InputStream polyfills = new FileInputStream(opts.get("p"));
-
-        ESParser parser = ESParser.get().setGrammar(getStringFromInputStream(grammar));
-
         try
         {
+            if (args.length == 0)
+            {
+                System.out.print("Usage: es6translate -i input_file -g grammar_ file [-p polyfill] [-o output_file]");
+            }
+            Map<String, String> opts = parseOpts(args);
+            if (!opts.containsKey("i"))
+            {
+                System.out.print("Missing required parameter -i (input file).");
+            }
+
+            InputStream stream = new FileInputStream(opts.get("i"));
+
+            if (!opts.containsKey("g"))
+            {
+                System.out.print("Missing required parameter -g (grammar file).");
+            }
+            InputStream grammar = new FileInputStream(opts.get("g"));
+
+            InputStream polyfills = null;
+            if (opts.containsKey("p"))
+            {
+                polyfills = new FileInputStream(opts.get("p"));
+            }
+
+            PrintStream output = null;
+            if (opts.containsKey("o"))
+            {
+                output = new PrintStream(new FileOutputStream(opts.get("o")));
+            }
+
+            ESParser parser = ESParser.get().setGrammar(getStringFromInputStream(grammar));
+
             Node tree = parser.process(getStringFromInputStream(stream));
 
-            Polyfiller polyfiller = new Polyfiller(getStringFromInputStream(polyfills));
+            Polyfiller polyfiller = new Polyfiller(polyfills != null ? getStringFromInputStream(polyfills) : "");
 
             Translator translator = new Translator((NonTerminalNode)tree);
             translator.setPolyfiller(polyfiller);
             translator.convert();
 
-            System.out.print(polyfiller.getShims());
-            System.out.print(tree.toString());
+            if (output == null)
+            {
+                System.out.print(polyfiller.getShims());
+                System.out.print(tree.toString());
+            }
+            else
+            {
+                output.append(polyfiller.getShims());
+                output.append(tree.toString());
+            }
         }
         catch (PositionException e)
         {
