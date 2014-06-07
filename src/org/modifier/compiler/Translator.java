@@ -1,6 +1,5 @@
 package org.modifier.compiler;
 
-import com.sun.deploy.util.StringUtils;
 import org.modifier.parser.Node;
 import org.modifier.parser.NonTerminalNode;
 import org.modifier.parser.TerminalNode;
@@ -49,7 +48,7 @@ public class Translator
                 }
                 else
                 {
-                    polyfiller.reserveClassName(((TerminalNode)node).getToken().value);
+                    polyfiller.reserveClassName(((TerminalNode) node).getToken().value);
                 }
             }
         }
@@ -254,9 +253,23 @@ public class Translator
             }
         }
 
-        String result = "(" + foo.getToken().value + "([" + StringUtils.join(pieces, ", ") + "], " + StringUtils.join(arguments, ", ") + "))";
+        String result = "(" + foo.getToken().value + "([" + join(pieces, ", ") + "], " + join(arguments, ", ") + "))";
 
         NonTerminalNode tree = (NonTerminalNode)ESParser.get().processImmediate(result, node);
+    }
+
+    private String join (ArrayList<String> pieces, String glue)
+    {
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < pieces.size(); i++)
+        {
+            if (i != 0)
+            {
+                result.append(glue);
+            }
+            result.append(pieces.get(i));
+        }
+        return result.toString();
     }
 
     private void checkQuasiliteral(NonTerminalNode node) throws PositionException, TerminalReaderException
@@ -337,7 +350,7 @@ public class Translator
                 }
             }
         }
-        String result = "(" + StringUtils.join(pieces, " + ") + ")";
+        String result = "(" + join(pieces, " + ") + ")";
 
         node.clearChildren();
         NonTerminalNode tree = (NonTerminalNode)ESParser.get().processImmediate(result, node);
