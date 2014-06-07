@@ -16,15 +16,21 @@ public class ESCompiler
 
         InputStream grammar = new FileInputStream(opts.get("g"));
 
+        InputStream polyfills = new FileInputStream(opts.get("p"));
+
         ESParser parser = ESParser.get().setGrammar(getStringFromInputStream(grammar));
 
         try
         {
             Node tree = parser.process(getStringFromInputStream(stream));
 
+            Polyfiller polyfiller = new Polyfiller(getStringFromInputStream(polyfills));
+
             Translator translator = new Translator((NonTerminalNode)tree);
+            translator.setPolyfiller(polyfiller);
             translator.convert();
 
+            System.out.print(polyfiller.getShims());
             System.out.print(tree.toString());
         }
         catch (PositionException e)
@@ -56,6 +62,10 @@ public class ESCompiler
 
                 case "-g":
                     result.put("g", args[++i]);
+                    break;
+
+                case "-p":
+                    result.put("p", args[++i]);
                     break;
 
                 default:

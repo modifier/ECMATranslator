@@ -18,6 +18,8 @@ import java.util.HashMap;
 public class Translator
 {
     protected NonTerminalNode root;
+    private Polyfiller polyfiller;
+
     public Translator (NonTerminalNode node)
     {
         root = node;
@@ -38,6 +40,17 @@ public class Translator
             if (node instanceof NonTerminalNode)
             {
                 explore((NonTerminalNode)node);
+            }
+            else if (node.getNodeClass() == TokenClass.get("Ident"))
+            {
+                if (root.getNodeClass() == TokenClass.get("MemberExpressionPart"))
+                {
+                    polyfiller.reservePrototypeMethod(((TerminalNode)node).getToken().value);
+                }
+                else
+                {
+                    polyfiller.reserveClassName(((TerminalNode)node).getToken().value);
+                }
             }
         }
     }
@@ -566,5 +579,9 @@ public class Translator
         wrapper.get(2).update(node.clone());
         node.update(wrapper.get(0));
         wrapper.get(1).update(preCalculation.get(0));
+    }
+
+    public void setPolyfiller(Polyfiller polyfiller) {
+        this.polyfiller = polyfiller;
     }
 }

@@ -1,0 +1,220 @@
+Array.from
+Array.from = Array.from || function(list) {
+    var mapFn = arguments.length > 1 ? arguments[1] : undefined;
+    var thisArg = arguments.length > 2 ? arguments[2] : undefined;
+
+    if (mapFn !== undefined && typeof mapFn != "function") {
+        throw new TypeError('Array.from: when provided, the second argument must be a function');
+    }
+
+    var result = new Array(list.length);
+    var value;
+
+    for (var i = 0; i < list.length; i++) {
+        value = list[i];
+        if (mapFn !== undefined) {
+            result[i] = thisArg ? mapFn.call(thisArg, value) : mapFn(value);
+        } else {
+            result[i] = value;
+        }
+    }
+
+    return result;
+};
+===
+Array.of
+Array.of = Array.of || function() {
+    var list = arguments;
+    var result = new Array(list.length);
+
+    for (var i = 0; i < list.length; i++) {
+        result[i] = list[i];
+    }
+
+    return result;
+};
+===
+Array.prototype.find
+Array.prototype.find = Array.prototype.find || function () {
+    var list = this;
+    if (typeof predicate != "function") {
+        throw new TypeError('Array#find: predicate must be a function');
+    }
+    var thisArg = arguments[1] || this;
+    for (var i = 0, value; i < list.length; i++) {
+        if (i in list) {
+            value = list[i];
+            if (predicate.call(thisArg, value, i, list)) return value;
+        }
+    }
+    return undefined;
+};
+===
+Array.prototype.findIndex
+Array.prototype.findIndex = Array.prototype.findIndex || function(predicate) {
+    var list = this;
+    if (typeof predicate != "function") {
+        throw new TypeError('Array#findIndex: predicate must be a function');
+    }
+    var thisArg = arguments[1] || this;
+    for (var i = 0; i < this.length; i++) {
+        if (i in list) {
+            if (predicate.call(thisArg, list[i], i, list)) return i;
+        }
+    }
+    return -1;
+};
+===
+Array.prototype.fill
+Array.prototype.fill = Array.prototype.fill || function(value) {
+    var start = arguments[1], end = arguments[2];
+    var len = O.length;
+    start = start===undefined ? 0 : start;
+    end = end===undefined ? len : end;
+
+    var relativeStart = start < 0 ? Math.max(len + start, 0) : Math.min(start, len);
+
+    for (var i = relativeStart; i < len && i < end; ++i) {
+        this[i] = value;
+    }
+    return this;
+};
+===
+Object.assign
+Object.assign = Object.assign || function(target, source) {
+    if (typeof target != "object") {
+        throw new TypeError('target must be an object');
+    }
+    return Array.prototype.reduce.call(arguments, function(target, source) {
+    if (typeof source != "object") {
+        throw new TypeError('source must be an object');
+    }
+    return Object.keys(source).reduce(function(target, key) {
+            target[key] = source[key];
+            return target;
+        }, target);
+    });
+};
+===
+Object.getPropertyDescriptor
+Object.getPropertyDescriptor = getPropertyDescriptor || function(subject, name) {
+    var pd = Object.getOwnPropertyDescriptor(subject, name);
+    var proto = Object.getPrototypeOf(subject);
+    while (pd === undefined && proto !== null) {
+        pd = Object.getOwnPropertyDescriptor(proto, name);
+        proto = Object.getPrototypeOf(proto);
+    }
+    return pd;
+};
+===
+Object.getPropertyNames
+Object.getPropertyNames = Object.getPropertyNames || function(subject) {
+    var result = Object.getOwnPropertyNames(subject);
+    var proto = Object.getPrototypeOf(subject);
+
+    var addProperty = function(property) {
+        if (result.indexOf(property) === -1) {
+            result.push(property);
+        }
+    };
+
+    while (proto !== null) {
+        Object.getOwnPropertyNames(proto).forEach(addProperty);
+        proto = Object.getPrototypeOf(proto);
+    }
+    return result;
+};
+===
+Object.is
+Object.is = Object.is || function(a, b) {
+    if (a === b) {
+        // 0 === -0, but they are not identical.
+        if (a === 0) return 1 / a === 1 / b;
+        return true;
+    }
+    return Number.isNaN(a) && Number.isNaN(b);
+}
+===
+Object.setPrototypeOf
+Object.setPrototypeOf = Object.setPrototypeOf || (function(Object, magic) {
+    var set;
+
+    var checkArgs = function(O, proto) {
+        if (!ES.TypeIsObject(O)) {
+            throw new TypeError('cannot set prototype on a non-object');
+        }
+        if (!(proto===null || ES.TypeIsObject(proto))) {
+            throw new TypeError('can only set prototype to an object or null'+proto);
+        }
+    };
+
+    var setPrototypeOf = function(O, proto) {
+        checkArgs(O, proto);
+        set.call(O, proto);
+        return O;
+    };
+
+    try {
+        // this works already in Firefox and Safari
+        set = Object.getOwnPropertyDescriptor(Object.prototype, magic).set;
+        set.call({}, null);
+    } catch (e) {
+        if (Object.prototype !== {}[magic]) {
+            // IE < 11 cannot be shimmed
+            return;
+        }
+        // probably Chrome or some old Mobile stock browser
+        set = function(proto) {
+            this[magic] = proto;
+        };
+        // please note that this will **not** work
+        // in those browsers that do not inherit
+        // __proto__ by mistake from Object.prototype
+        // in these cases we should probably throw an error
+        // or at least be informed about the issue
+        setPrototypeOf.polyfill = setPrototypeOf(
+            setPrototypeOf({}, null),
+            Object.prototype
+        ) instanceof Object;
+        // setPrototypeOf.polyfill === true means it works as meant
+        // setPrototypeOf.polyfill === false means it's not 100% reliable
+        // setPrototypeOf.polyfill === undefined
+        // or
+        // setPrototypeOf.polyfill ==  null means it's not a polyfill
+        // which means it works as expected
+        // we can even delete Object.prototype.__proto__;
+    }
+    return setPrototypeOf;
+})(Object, '__proto__');
+===
+#String.fromCodePoint
+#String.prototype.codePointAt
+#String.prototype.repeat
+#String.prototype.startsWith
+#String.prototype.endsWith
+#String.prototype.contains
+#Number.isFinite
+#Number.isInteger
+#Number.isSafeInteger
+#Number.isNaN
+#Number.toInteger
+#Number.EPSILON
+#Number.MIN_SAFE_INTEGER
+#Number.MAX_SAFE_INTEGER
+#Math.clz32
+#Math.imul
+#Math.sign
+#Math.log10
+#Math.log2
+#Math.log1p
+#Math.expm1
+#Math.cosh
+#Math.sinh
+#Math.tanh
+#Math.acosh
+#Math.asinh
+#Math.atanh
+#Math.hypot
+#Math.trunc
+#Math.fround
+#Math.cbrt
