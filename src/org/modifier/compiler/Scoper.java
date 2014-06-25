@@ -63,7 +63,7 @@ public class Scoper
                 return;
             }
             isConst = ((TerminalNode)first).getToken().value.equals("const");
-            isVarScope = isConst || ((TerminalNode)first).getToken().value.equals("var");
+            isVarScope = ((TerminalNode)first).getToken().value.equals("var");
 
             NonTerminalNode currentList = (NonTerminalNode)(node).findNodeClass("VariableDeclarationList");
             do

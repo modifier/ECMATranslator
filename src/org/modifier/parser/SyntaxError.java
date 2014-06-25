@@ -30,4 +30,9 @@ public class SyntaxError extends PositionException
     {
         return new SyntaxError("Unknown rule encountered: '" + rule.toString() + "'", line, position);
     }
+
+    public static SyntaxError unknownRule(TokenClass rule, Token token)
+    {
+        return new SyntaxError("Unexpected token " + token.toString() + ", rule encountered: '" + rule.toString() + "'", token.getLine(), token.getPosition());
+    }
 }

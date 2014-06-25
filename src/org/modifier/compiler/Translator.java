@@ -90,6 +90,23 @@ public class Translator
         {
             checkClassDeclaration(node);
         }
+
+        if (node.getNodeClass() == TokenClass.get("VariableStatement"))
+        {
+            checkConstDeclaration(node);
+        }
+    }
+
+    private void checkConstDeclaration(NonTerminalNode node)
+    {
+        Node kid = node.getChildren().get(0);
+        if (kid instanceof TerminalNode && ((TerminalNode) kid).getToken().value.equals("const"))
+        {
+            Token token = ((TerminalNode) kid).getToken();
+            Token clone = new Token("var", "Declarator");
+            clone.setPosition(token.getLine(), token.getPosition());
+            ((TerminalNode) kid).setToken(clone);
+        }
     }
 
     private void checkSuperInstruction(NonTerminalNode node) throws TerminalReaderException, PositionException
@@ -112,7 +129,8 @@ public class Translator
         {
             builder.append(tail.toString());
         }
-        String args = arguments.findNodeClass("Expression").toString();
+        Node expr = arguments.findNodeClass("Expression");
+        String args = expr == null ? "" : expr.toString();
 
         builder.append(".call(this");
         if (!args.equals(""))
@@ -144,7 +162,7 @@ public class Translator
 
         HashMap<String, Node> methods = new HashMap<>();
         NonTerminalNode classBody = (NonTerminalNode)node.findNodeClass("ClassBody");
-        do
+        while (classBody.getChildren().size() != 0)
         {
             NonTerminalNode classElement = (NonTerminalNode)classBody.findNodeClass("ClassElement");
 
@@ -152,7 +170,7 @@ public class Translator
             methods.put(methodName, classElement.findDeep("FunctionBody"));
 
             classBody = (NonTerminalNode)classElement.findNodeClass("ClassBody");
-        } while (classBody.getChildren().size() != 0);
+        }
 
         // Function declaration
         StringBuilder builder = new StringBuilder();
@@ -205,7 +223,7 @@ public class Translator
         ArrayList<String> arguments = new ArrayList<>();
         boolean escaping = false;
         boolean isLiteral = true;
-        for (int i = 1; i < value.length(); i++)
+        for (int i = 1; i < value.length() - 1; i++)
         {
             char symbol = value.charAt(i);
             if ('\\' == symbol)
@@ -219,19 +237,19 @@ public class Translator
 
             if (isLiteral)
             {
-                if ('$' == symbol && !escaping)
+                if ('$' == symbol && !escaping && '{' == value.charAt(i+1))
                 {
-                    if ('{' != value.charAt(++i))
-                    {
-                        throw ScanError.incorrectQuasiliteral(quasi.getLine(), quasi.getPosition());
-                    }
+                    ++i;
                     isLiteral = false;
-                    pieces.add('"' + accumulator.toString() + '"');
+                    if (accumulator.length() != 0)
+                    {
+                        pieces.add('"' + accumulator.toString() + '"');
+                    }
                     accumulator = new StringBuilder();
                 }
-                else if ('`' == symbol)
+                else if ('"' == symbol)
                 {
-                    accumulator.append('"');
+                    accumulator.append("\\\"");
                 }
                 else
                 {
@@ -243,7 +261,7 @@ public class Translator
                 if ('}' == symbol && !escaping)
                 {
                     isLiteral = true;
-                    arguments.add(accumulator.toString());
+                    arguments.add("(" + accumulator.toString() + ")");
                     accumulator = new StringBuilder();
                 }
                 else
@@ -252,10 +270,20 @@ public class Translator
                 }
             }
         }
+        if (accumulator.length() != 0)
+        {
+            pieces.add('"' + accumulator.toString() + '"');
+        }
 
-        String result = "(" + foo.getToken().value + "([" + join(pieces, ", ") + "], " + join(arguments, ", ") + "))";
+        StringBuilder resultBuilder = new StringBuilder();
+        resultBuilder.append("(").append(foo.getToken().value).append("([").append(join(pieces, ", ")).append("]");
+        if (arguments.size() != 0)
+        {
+            resultBuilder.append(", ").append(join(arguments, ", "));
+        }
+        resultBuilder.append("))");
 
-        NonTerminalNode tree = (NonTerminalNode)ESParser.get().processImmediate(result, node);
+        NonTerminalNode tree = (NonTerminalNode)ESParser.get().processImmediate(resultBuilder.toString(), node);
     }
 
     private String join (ArrayList<String> pieces, String glue)
@@ -303,7 +331,7 @@ public class Translator
         ArrayList<String> pieces = new ArrayList<>();
         boolean escaping = false;
         boolean isLiteral = true;
-        for (int i = 1; i < value.length(); i++)
+        for (int i = 1; i < value.length() - 1; i++)
         {
             char symbol = value.charAt(i);
             if ('\\' == symbol)
@@ -317,19 +345,19 @@ public class Translator
 
             if (isLiteral)
             {
-                if ('$' == symbol && !escaping)
+                if ('$' == symbol && !escaping && '{' == value.charAt(i+1))
                 {
-                    if ('{' != value.charAt(++i))
-                    {
-                        throw ScanError.incorrectQuasiliteral(quasi.getLine(), quasi.getPosition());
-                    }
+                    ++i;
                     isLiteral = false;
-                    pieces.add('"' + accumulator.toString() + '"');
+                    if (accumulator.length() != 0)
+                    {
+                        pieces.add('"' + accumulator.toString() + '"');
+                    }
                     accumulator = new StringBuilder();
                 }
-                else if ('`' == symbol)
+                else if ('"' == symbol)
                 {
-                    accumulator.append('"');
+                    accumulator.append("\\\"");
                 }
                 else
                 {
@@ -341,7 +369,7 @@ public class Translator
                 if ('}' == symbol && !escaping)
                 {
                     isLiteral = true;
-                    pieces.add(accumulator.toString());
+                    pieces.add("(" + accumulator.toString() + ")");
                     accumulator = new StringBuilder();
                 }
                 else
@@ -350,7 +378,20 @@ public class Translator
                 }
             }
         }
-        String result = "(" + join(pieces, " + ") + ")";
+        if (accumulator.length() != 0)
+        {
+            pieces.add('"' + accumulator.toString() + '"');
+        }
+
+        String result;
+        if (pieces.size() == 0)
+        {
+             result = "\"\"";
+        }
+        else
+        {
+            result = "(" + join(pieces, " + ") + ")";
+        }
 
         node.clearChildren();
         NonTerminalNode tree = (NonTerminalNode)ESParser.get().processImmediate(result, node);
@@ -359,6 +400,10 @@ public class Translator
     private void checkConstInstruction (NonTerminalNode node) throws TypeError
     {
         NonTerminalNode rightSide = (NonTerminalNode)node.findNodeClass("BinaryExpression");
+        if (rightSide == null) {
+            return;
+        }
+
         boolean hasAssignment = rightSide.findNodeClass("AssignmentOperator") != null;
 
         if (!hasAssignment)
@@ -400,12 +445,7 @@ public class Translator
 
         ((TerminalNode)first).setToken(new Token("var"));
 
-        NonTerminalNode letBlock = node.closestLetBlock();
-
-        if (letBlock.isVarBlock())
-        {
-            return;
-        }
+        NonTerminalNode letBlock = node.closestVarBlock();
 
         HashMap<String, String> renamed = new HashMap<>();
 
@@ -533,7 +573,7 @@ public class Translator
         StringBuilder b = new StringBuilder();
         for (TerminalNode key : assignees.keySet())
         {
-            b.append("if(" + key.getToken().value + " == null){" +
+            b.append("if(typeof " + key.getToken().value + " == \"undefined\"){" +
                 key.getToken().value + " = " + assignees.get(key).toString() + ";}");
         }
         b.append(body.toString());

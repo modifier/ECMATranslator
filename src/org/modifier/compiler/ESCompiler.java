@@ -1,7 +1,6 @@
 package org.modifier.compiler;
 import org.modifier.parser.*;
 import org.modifier.scanner.TokenClass;
-import org.modifier.utils.PositionException;
 
 import java.io.*;
 import java.text.ParseException;
@@ -15,27 +14,20 @@ public class ESCompiler
         {
             if (args.length == 0)
             {
-                System.out.print("Usage: es6translate -i input_file -g grammar_ file [-p polyfill] [-o output_file]");
+                System.out.println("Usage: es6translate -i input_file [-o output_file]");
+                return;
             }
             Map<String, String> opts = parseOpts(args);
             if (!opts.containsKey("i"))
             {
-                System.out.print("Missing required parameter -i (input file).");
+                System.out.println("Missing required parameter -i (input file).");
+                return;
             }
 
             InputStream stream = new FileInputStream(opts.get("i"));
 
-            if (!opts.containsKey("g"))
-            {
-                System.out.print("Missing required parameter -g (grammar file).");
-            }
-            InputStream grammar = new FileInputStream(opts.get("g"));
-
-            InputStream polyfills = null;
-            if (opts.containsKey("p"))
-            {
-                polyfills = new FileInputStream(opts.get("p"));
-            }
+            InputStream grammar = System.class.getResourceAsStream("/terminals.res");
+            InputStream polyfill = System.class.getResourceAsStream("/polyfill.res");
 
             PrintStream output = null;
             if (opts.containsKey("o"))
@@ -47,7 +39,7 @@ public class ESCompiler
 
             Node tree = parser.process(getStringFromInputStream(stream));
 
-            Polyfiller polyfiller = new Polyfiller(polyfills != null ? getStringFromInputStream(polyfills) : "");
+            Polyfiller polyfiller = new Polyfiller(getStringFromInputStream(polyfill));
 
             Translator translator = new Translator((NonTerminalNode)tree);
             translator.setPolyfiller(polyfiller);
@@ -57,6 +49,7 @@ public class ESCompiler
             {
                 System.out.print(polyfiller.getShims());
                 System.out.print(tree.toString());
+                System.out.println();
             }
             else
             {
@@ -64,13 +57,16 @@ public class ESCompiler
                 output.append(tree.toString());
             }
         }
-        catch (PositionException e)
-        {
-            System.out.print(e.getMessage());
-        }
         catch (Exception e)
         {
-            e.printStackTrace();
+            if (e.getMessage() == null)
+            {
+                e.printStackTrace();
+            }
+            else
+            {
+                System.out.println(e.getMessage());
+            }
         }
     }
 
@@ -89,14 +85,6 @@ public class ESCompiler
 
                 case "-o":
                     result.put("o", args[++i]);
-                    break;
-
-                case "-g":
-                    result.put("g", args[++i]);
-                    break;
-
-                case "-p":
-                    result.put("p", args[++i]);
                     break;
 
                 default:

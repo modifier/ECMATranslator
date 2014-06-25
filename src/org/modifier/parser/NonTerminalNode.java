@@ -203,12 +203,19 @@ public class NonTerminalNode extends Node
                     continue;
                 }
                 boolean isNowWord = isAlphaString(child.toString());
-                if (isNowWord == isPrevWord && isNowWord)
+                if ((isNowWord == isPrevWord && isNowWord))
                 {
                     builder.append(' ');
                 }
                 isPrevWord = isNowWord;
                 builder.append(child.toString());
+                if (
+                    ((TerminalNode) child).getToken().value.equals("case")
+                    || ((TerminalNode) child).getToken().value.equals("void")
+                )
+                {
+                    builder.append(' ');
+                }
             }
             else
             {

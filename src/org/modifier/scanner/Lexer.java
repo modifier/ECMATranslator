@@ -38,7 +38,9 @@ public class Lexer implements Iterable<Token>
             {
                 if (value.equals(token.value))
                 {
-                    return new Token(value, TokenClass.get(key));
+                    Token result = new Token(value, TokenClass.get(key));
+                    result.setPosition(token.getLine(), token.getPosition());
+                    return result;
                 }
             }
         }

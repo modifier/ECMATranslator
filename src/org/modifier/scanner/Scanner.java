@@ -257,7 +257,7 @@ public class Scanner implements Iterable<Token>
     private boolean isRegex (char symbol)
     {
         // TODO: check whether line is a regex or a division symbol
-        return '/' == symbol;
+        return false;
     }
 
     private boolean isQuasi (char symbol)

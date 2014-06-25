@@ -53,8 +53,11 @@ public class SyntaxTable extends AbstractSyntaxTable
             else if (token.value.equals("("))
             {
                 result.add(new TerminalNode("("));
-                result.add(new NonTerminalNode(TokenClass.get("Expression")));
-                result.add(new TerminalNode(")"));
+                result.add(new NonTerminalNode(TokenClass.get("PrimaryExpression_2")));
+            }
+            else
+            {
+                throw SyntaxError.unknownRule(nodeClass, token);
             }
         }
         else if (nodeClass == TokenClass.get("PrimaryExpression_1"))
@@ -64,10 +67,24 @@ public class SyntaxTable extends AbstractSyntaxTable
                 result.add(new TerminalNode(TokenClass.get("Quasiliteral")));
             }
         }
+        else if (nodeClass == TokenClass.get("PrimaryExpression_2"))
+        {
+            if (!token.value.equals(")"))
+            {
+                result.add(new NonTerminalNode(TokenClass.get("Expression")));
+            }
+            result.add(new TerminalNode(")"));
+        }
         else if (nodeClass == TokenClass.get("ArrayLiteral"))
         {
             result.add(new TerminalNode("["));
-            result.add(new NonTerminalNode(TokenClass.get("ElementList")));
+            result.add(new NonTerminalNode(TokenClass.get("ArrayLiteral_1")));
+        }
+        else if (nodeClass == TokenClass.get("ArrayLiteral_1"))
+        {
+            if (!token.value.equals("]")) {
+                result.add(new NonTerminalNode(TokenClass.get("ElementList")));
+            }
             result.add(new TerminalNode("]"));
         }
         else if (nodeClass == TokenClass.get("ElementList"))
@@ -145,6 +162,56 @@ public class SyntaxTable extends AbstractSyntaxTable
             }
             result.add(new NonTerminalNode(TokenClass.get("BinaryExpression")));
         }
+        else if (nodeClass == TokenClass.get("AssignmentExpressionNoIn"))
+        {
+            if (token.classId == TokenClass.get("AdditiveOperator") || token.classId == TokenClass.get("UnaryOperator") || token.classId == TokenClass.get("PostfixOperator"))
+            {
+                result.add(new NonTerminalNode(TokenClass.get("UnaryExpression")));
+            }
+            else
+            {
+                result.add(new NonTerminalNode(TokenClass.get("LeftHandSideExpression")));
+            }
+            result.add(new NonTerminalNode(TokenClass.get("BinaryExpressionNoIn")));
+        }
+        else if (nodeClass == TokenClass.get("BinaryExpressionNoIn"))
+        {
+            if (token.classId == TokenClass.get("AdditiveOperator"))
+            {
+                result.add(new TerminalNode(TokenClass.get("AdditiveOperator")));
+                result.add(new NonTerminalNode(TokenClass.get("UnaryExpression")));
+                result.add(new NonTerminalNode(TokenClass.get("BinaryExpressionNoIn")));
+            }
+            else if (token.classId == TokenClass.get("BinaryOperator"))
+            {
+                result.add(new TerminalNode(TokenClass.get("BinaryOperator")));
+                result.add(new NonTerminalNode(TokenClass.get("UnaryExpression")));
+                result.add(new NonTerminalNode(TokenClass.get("BinaryExpressionNoIn")));
+            }
+            else if (token.classId == TokenClass.get("UnaryOperator"))
+            {
+                result.add(new TerminalNode(TokenClass.get("UnaryOperator")));
+            }
+            else if (token.value.equals("="))
+            {
+                result.add(new TerminalNode("=", "AssignmentOperator"));
+                result.add(new NonTerminalNode(TokenClass.get("UnaryExpression")));
+                result.add(new NonTerminalNode(TokenClass.get("BinaryExpressionNoIn")));
+            }
+            else if (token.classId == TokenClass.get("AssignmentOperator"))
+            {
+                result.add(new TerminalNode(TokenClass.get("AssignmentOperator")));
+                result.add(new NonTerminalNode(TokenClass.get("AssignmentExpression")));
+                result.add(new NonTerminalNode(TokenClass.get("BinaryExpressionNoIn")));
+            }
+            else if (token.value.equals("?"))
+            {
+                result.add(new TerminalNode("?"));
+                result.add(new NonTerminalNode(TokenClass.get("AssignmentExpressionNoIn")));
+                result.add(new TerminalNode(":"));
+                result.add(new NonTerminalNode(TokenClass.get("AssignmentExpressionNoIn")));
+            }
+        }
         else if (nodeClass == TokenClass.get("BinaryExpression"))
         {
             if (token.classId == TokenClass.get("AdditiveOperator"))
@@ -159,6 +226,16 @@ public class SyntaxTable extends AbstractSyntaxTable
                 result.add(new NonTerminalNode(TokenClass.get("UnaryExpression")));
                 result.add(new NonTerminalNode(TokenClass.get("BinaryExpression")));
             }
+            else if (token.value.equals("in"))
+            {
+                result.add(new TerminalNode("in"));
+                result.add(new NonTerminalNode(TokenClass.get("UnaryExpression")));
+                result.add(new NonTerminalNode(TokenClass.get("BinaryExpression")));
+            }
+            else if (token.classId == TokenClass.get("UnaryOperator"))
+            {
+                result.add(new TerminalNode(TokenClass.get("UnaryOperator")));
+            }
             else if (token.value.equals("="))
             {
                 result.add(new TerminalNode("=", "AssignmentOperator"));
@@ -170,6 +247,13 @@ public class SyntaxTable extends AbstractSyntaxTable
                 result.add(new TerminalNode(TokenClass.get("AssignmentOperator")));
                 result.add(new NonTerminalNode(TokenClass.get("AssignmentExpression")));
                 result.add(new NonTerminalNode(TokenClass.get("BinaryExpression")));
+            }
+            else if (token.value.equals("?"))
+            {
+                result.add(new TerminalNode("?"));
+                result.add(new NonTerminalNode(TokenClass.get("AssignmentExpression")));
+                result.add(new TerminalNode(":"));
+                result.add(new NonTerminalNode(TokenClass.get("AssignmentExpression")));
             }
         }
         else if (nodeClass == TokenClass.get("UnaryExpression"))
@@ -183,14 +267,6 @@ public class SyntaxTable extends AbstractSyntaxTable
                 result.add(new TerminalNode(TokenClass.get("UnaryOperator")));
             }
             result.add(new NonTerminalNode(TokenClass.get("LeftHandSideExpression")));
-            result.add(new NonTerminalNode(TokenClass.get("PostfixExpression")));
-        }
-        else if (nodeClass == TokenClass.get("PostfixExpression"))
-        {
-            if (token.classId == TokenClass.get("PostfixOperator"))
-            {
-                result.add(new TerminalNode(TokenClass.get("PostfixOperator")));
-            }
         }
         else if (nodeClass == TokenClass.get("LeftHandSideExpression"))
         {
@@ -216,7 +292,14 @@ public class SyntaxTable extends AbstractSyntaxTable
         else if (nodeClass == TokenClass.get("LeftHandSideExpression_2"))
         {
             result.add(new TerminalNode("("));
-            result.add(new NonTerminalNode(TokenClass.get("Expression")));
+            result.add(new NonTerminalNode(TokenClass.get("LeftHandSideExpression_3")));
+        }
+        else if (nodeClass == TokenClass.get("LeftHandSideExpression_3"))
+        {
+            if (!token.value.equals(")"))
+            {
+                result.add(new NonTerminalNode(TokenClass.get("Expression")));
+            }
             result.add(new TerminalNode(")"));
         }
         else if (nodeClass == TokenClass.get("MemberExpression"))
@@ -240,8 +323,7 @@ public class SyntaxTable extends AbstractSyntaxTable
             if (token.value.equals("("))
             {
                 result.add(new TerminalNode("("));
-                result.add(new NonTerminalNode(TokenClass.get("Expression")));
-                result.add(new TerminalNode(")"));
+                result.add(new NonTerminalNode(TokenClass.get("MemberExpressionPart_1")));
                 result.add(new NonTerminalNode(TokenClass.get("MemberExpressionPart")));
             }
             else if (token.value.equals("["))
@@ -257,6 +339,14 @@ public class SyntaxTable extends AbstractSyntaxTable
                 result.add(new TerminalNode(TokenClass.get("Ident")));
                 result.add(new NonTerminalNode(TokenClass.get("MemberExpressionPart")));
             }
+        }
+        else if (nodeClass == TokenClass.get("MemberExpressionPart_1"))
+        {
+            if (!token.value.equals(")"))
+            {
+                result.add(new NonTerminalNode(TokenClass.get("Expression")));
+            }
+            result.add(new TerminalNode(")"));
         }
         else if (nodeClass == TokenClass.get("AllocationExpression"))
         {
@@ -364,7 +454,7 @@ public class SyntaxTable extends AbstractSyntaxTable
         }
         else if (nodeClass == TokenClass.get("StatementList"))
         {
-            if (!token.value.equals("}"))
+            if (!token.value.equals("}") && !token.value.equals("case") && !token.value.equals("default"))
             {
                 result.add(new NonTerminalNode(TokenClass.get("Statement")));
                 result.add(new NonTerminalNode(TokenClass.get("StatementList")));
@@ -490,7 +580,7 @@ public class SyntaxTable extends AbstractSyntaxTable
             }
             else
             {
-                result.add(new NonTerminalNode(TokenClass.get("Expression")));
+                result.add(new NonTerminalNode(TokenClass.get("AssignmentExpressionNoIn")));
             }
         }
         else if (nodeClass == TokenClass.get("ForStatement_2"))
@@ -587,10 +677,14 @@ public class SyntaxTable extends AbstractSyntaxTable
                 result.add(new NonTerminalNode(TokenClass.get("Expression")));
                 result.add(new TerminalNode(":"));
             }
-            else
+            else if (token.value.equals("default"))
             {
                 result.add(new TerminalNode("default"));
                 result.add(new TerminalNode(":"));
+            }
+            else
+            {
+                return result;
             }
             result.add(new NonTerminalNode(TokenClass.get("OptionalStatementList")));
         }

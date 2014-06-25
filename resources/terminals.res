@@ -22,9 +22,9 @@
 "class"
 "super"
 "extends"
-PostfixOperator	        ::=	( "++" | "--" )
+"in"
 UnaryOperator	        ::=	( "delete" | "void" | "typeof" | "++" | "--" | "~" | "!" )
-BinaryOperator          ::= "*" | "/" | "<" | ">" | "<=" | ">=" | "instanceof" | "in" | "<<" | ">>" | ">>>" | "==" | "!=" | "===" | "!==" | "&" | "^" | "|" | "&&" | "||"
+BinaryOperator          ::= "*" | "/" | "<" | ">" | "<=" | ">=" | "instanceof" | "<<" | ">>" | ">>>" | "==" | "!=" | "===" | "!==" | "&" | "^" | "|" | "&&" | "||"
 AdditiveOperator	    ::=	"+" | "-"
 AssignmentOperator	    ::= "=" | "*=" | "%=" | "+=" | "-=" | "<<=" | ">>=" | ">>>=" | "&=" | "^=" | "|="
 Declarator              ::= "var" | "let" | "const"
